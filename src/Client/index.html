@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>POI</title>
+    <!-- <script src="./node_modules/jquery/dist/jquery.js"></script> -->
+  </head>
+  <body>
+    <div class="mensajes">
+      <!-- <div class="cubito" style="width: 10px; height: 10px; background:black; position:absolute;">
+
+      </div> -->
+      <canvas id="canvaspot" width="300" height="300"></canvas>
+      <!-- <ul id="messages"></ul> -->
+      <form  action="" >
+        <input id="m" autocomplete="off"/><button>Send</button>
+      </form>
+    </div>
+
+    <div id="videos">
+      <video id="you" class="flip" autoplay width="263" height="200" style="position: absolute; left: 0px; bottom: 0px;"></video>
+    </div>
+    <div id="chatbox">
+      <div id="hideShowMessages" class="button">toggle chat</div>
+      <div id="messages">
+      </div>
+      <input id="chatinput" type="text" placeholder="Message:"/>
+    </div>
+
+    <div class="buttonBox">
+      <div id="fullscreen" class="button">Enter Full Screen</div>
+      <div id="newRoom" class="button">Create A New Room</div>
+    </div>
+    <script>
+    var rtc = require('./node_modules/webrtc.io/lib/webrtc.io.js');
+    var conversation = require('./conversation.js')
+
+</script>
+  </body>
+</html>

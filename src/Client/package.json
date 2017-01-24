@@ -1,0 +1,23 @@
+{
+  "name": "client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "author": "Eloy Diaz",
+  "license": "ISC",
+  "dependencies": {
+    "jquery": "^3.1.1",
+    "remote": "^0.2.6",
+    "socket.io": "^1.7.2",
+    "socket.io-client": "^1.7.2",
+    "webrtc.io": "0.0.4",
+    "ws": "^1.1.1"
+  },
+  "devDependencies": {
+    "electron": "^1.4.15"
+  }
+}
