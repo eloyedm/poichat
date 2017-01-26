@@ -11,30 +11,108 @@
 
       </div> -->
       <canvas id="canvaspot" width="300" height="300"></canvas>
-      <!-- <ul id="messages"></ul> -->
+      <ul id="messages"></ul>
       <form  action="" >
         <input id="m" autocomplete="off"/><button>Send</button>
       </form>
-    </div>
 
-    <div id="videos">
-      <video id="you" class="flip" autoplay width="263" height="200" style="position: absolute; left: 0px; bottom: 0px;"></video>
+      <button type="button" id="callBtn" name="button">Llamar</button>
     </div>
-    <div id="chatbox">
-      <div id="hideShowMessages" class="button">toggle chat</div>
-      <div id="messages">
-      </div>
-      <input id="chatinput" type="text" placeholder="Message:"/>
-    </div>
+     <video autoplay id="local"></video>
 
-    <div class="buttonBox">
-      <div id="fullscreen" class="button">Enter Full Screen</div>
-      <div id="newRoom" class="button">Create A New Room</div>
-    </div>
+    <video autoplay id="pantalla">
+
+    </video>
+
     <script>
-    var rtc = require('./node_modules/webrtc.io/lib/webrtc.io.js');
-    var conversation = require('./conversation.js')
+    var $ = global.jQuery = require('./node_modules/jquery/dist/jquery.js');
+    const ipcRenderer = require('electron').ipcRenderer
+    var io = require('./node_modules/socket.io-client/dist/socket.io.js')
+    const remote = require("electron").remote
+    var window = remote.getCurrentWindow()
+    //
+    var socket = io('http://localhost:8001');
+    var userName = makeid()
+    // var rtc = require('webrtc.io-client');
+    // console.log(rtc);
+    // ipcRenderer.on('new-message', (event, arg) => {
+    //    $('#messages').append($('<li>').text(arg))
+    // })
 
-</script>
+    socket.on('chat message', function(msg){
+      $('#messages').append($('<li>').text(msg));
+    })
+
+    socket.on('video-frame', function(msg){
+      console.log(msg)
+      // $("#pantalla").attr("src", window.URL.createObjectURL(msg))
+    })
+
+    $('form').submit(() => {
+      // ipcRenderer.send('response-message', $('#m').val());
+      var msg = {
+        message: $('#m').val()
+      }
+      socket.emit('chat message', JSON.stringify(msg));
+      $('#m').val('');
+      return false;
+    });
+
+    // 'use strict';
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedua;
+    //
+    var constraints = {
+      audio: false,
+      video: true
+    };
+
+    var video = $("#local");
+    //
+    function successCallback(stream){
+      window.stream = stream;
+      if(window.URL) {
+        video.src = URL.createObjectURL(stream);
+
+        var configuration = {
+          "iceServers": [{ "url" : "nel"}]
+        }
+
+        yourConn = new webkitRTCPeerConnection(configuration)
+
+        yourConn.addStream(stream)
+        yourConn.onaddstream = function (e) {
+          $("#pantalla").src = window.URL.createObjectURL(e.stream);
+        }
+
+        yourConn.onicecandidate = function(event){
+          if(event.candidate){
+            socket.emit('candidate', {"candidate": event.candidate})
+          }
+        }
+        socket.emit('video-frame', video.src);
+      }else{
+        console.log(stream)
+        video.src = stream;
+      }
+    }
+    //
+    // function errorCallback(error){
+    //   console.log('navigator.getUserMedia erro: ', error);
+    // }
+    //
+    // navigator.getUserMedia(constraints, successCallback, errorCallback);
+
+
+    function makeid()
+    {
+      var text = "";
+      var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+      for( var i=0; i < 15; i++ )
+          text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+      return text;
+    }
+    </script>
   </body>
 </html>
