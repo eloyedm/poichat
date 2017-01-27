@@ -18,6 +18,7 @@ app.get('/', function(req, res){
 })
 
 io.on('connection', function(socket){
+  var chats = []
   socket.on('chat message', function(msg){
     try {
        data = JSON.parse(msg);
@@ -28,13 +29,73 @@ io.on('connection', function(socket){
     }
   });
 
+  socket.on('login', function(msg){
+    var data = validateMessage(msg)
+    if(data){
+      if(users[data.name]){
+        socket.emit('login', {success: false})
+      } else {
+        users[data.name] = socket.id;
+        socket.name = data.name;
+        socket.emit('login', {success: true,})
+      }
+    }
+  })
+
+  socket.on('offer', function(msg){
+    var data = validateMessage(msg)
+    if(data){
+      var conn = users[data.name];
+      if(conn != null){
+        chats.push(data.name)
+        socket.broadcast.to(users[data.name]).emit('offer', {
+          offer: data.offer,
+          name: socket.name
+        })
+      }
+    }
+  })
+
+  socket.on('answer', function(msg){
+    var data = validateMessage(msg)
+    if(data){
+      var conn = users[data.name]
+      if(conn != null){
+        chats.push(data.name)
+        socket.broadcast.to(users[data.name]).emit('answer', {
+          answer: data.answer
+        })
+      }
+    }
+  })
+
+  socket.on('candidate', function(msg){
+    var data = validateMessage(msg)
+    if(data){
+      var conn = users(data.name);
+      if(conn != null){
+        socket.broadcast.to(users[data.name]).emit('candidate', {
+          candidate: data.candidate
+        })
+      }
+    }
+  })
+
   socket.on('video-frame', function(msg){
     io.emit('video-frame', msg);
   })
 
-  users[data.name] = socket;
-  socket.name = data.namew
 })
+
+function validateMessage(msg){
+  try{
+    data = JSON.parse(msg)
+    return data;
+  }
+  catch(e){
+    return false
+  }
+}
 
 // webRTC.rtc.on('chat_msg', (data, socket) => {
 //   var roomList = webRTC.rtc.rooms[data.room] || [];

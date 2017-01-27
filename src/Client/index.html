@@ -20,9 +20,8 @@
     </div>
      <video autoplay id="local"></video>
 
-    <video autoplay id="pantalla">
-
-    </video>
+    <video autoplay id="pantalla"></video>
+    <button type="button" id="login" name="button">Login</button>
 
     <script>
     var $ = global.jQuery = require('./node_modules/jquery/dist/jquery.js');
@@ -32,21 +31,38 @@
     var window = remote.getCurrentWindow()
     //
     var socket = io('http://localhost:8001');
-    var userName = makeid()
+    var userName = {name: makeid()}
     // var rtc = require('webrtc.io-client');
     // console.log(rtc);
     // ipcRenderer.on('new-message', (event, arg) => {
     //    $('#messages').append($('<li>').text(arg))
     // })
 
+
+    $("#login").click(() =>{
+      socket.emit('login', JSON.stringify(userName))
+    })
+
     socket.on('chat message', function(msg){
       $('#messages').append($('<li>').text(msg));
     })
 
-    socket.on('video-frame', function(msg){
-      console.log(msg)
-      // $("#pantalla").attr("src", window.URL.createObjectURL(msg))
+    socket.on('login', function(data){
+      console.log(data)
     })
+
+    socket.on('offer', function(data){
+      handleOffer(data.offer, data.name)
+    })
+
+    socket.on('answer', function(data){
+      handleAnswer(data.offer, data.name)
+    })
+
+    socket.on('offer', function(data){
+      handleOffer(data.offer, data.name)
+    })
+
 
     $('form').submit(() => {
       // ipcRenderer.send('response-message', $('#m').val());
@@ -59,42 +75,42 @@
     });
 
     // 'use strict';
-    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedua;
+    // navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedua;
+    // //
+    // var constraints = {
+    //   audio: false,
+    //   video: true
+    // };
     //
-    var constraints = {
-      audio: false,
-      video: true
-    };
-
-    var video = $("#local");
+    // var video = $("#local");
+    // //
+    // function successCallback(stream){
+    //   window.stream = stream;
+    //   if(window.URL) {
+    //     video.src = URL.createObjectURL(stream);
     //
-    function successCallback(stream){
-      window.stream = stream;
-      if(window.URL) {
-        video.src = URL.createObjectURL(stream);
-
-        var configuration = {
-          "iceServers": [{ "url" : "nel"}]
-        }
-
-        yourConn = new webkitRTCPeerConnection(configuration)
-
-        yourConn.addStream(stream)
-        yourConn.onaddstream = function (e) {
-          $("#pantalla").src = window.URL.createObjectURL(e.stream);
-        }
-
-        yourConn.onicecandidate = function(event){
-          if(event.candidate){
-            socket.emit('candidate', {"candidate": event.candidate})
-          }
-        }
-        socket.emit('video-frame', video.src);
-      }else{
-        console.log(stream)
-        video.src = stream;
-      }
-    }
+    //     var configuration = {
+    //       "iceServers": [{ "url" : "nel"}]
+    //     }
+    //
+    //     yourConn = new webkitRTCPeerConnection(configuration)
+    //
+    //     yourConn.addStream(stream)
+    //     yourConn.onaddstream = function (e) {
+    //       $("#pantalla").src = window.URL.createObjectURL(e.stream);
+    //     }
+    //
+    //     yourConn.onicecandidate = function(event){
+    //       if(event.candidate){
+    //         socket.emit('candidate', {"candidate": event.candidate})
+    //       }
+    //     }
+    //     socket.emit('video-frame', video.src);
+    //   }else{
+    //     console.log(stream)
+    //     video.src = stream;
+    //   }
+    // }
     //
     // function errorCallback(error){
     //   console.log('navigator.getUserMedia erro: ', error);
