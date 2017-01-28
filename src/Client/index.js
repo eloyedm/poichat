@@ -10,7 +10,7 @@ let win;
 
 
 function createWindow() {
-  win = new BrowserWindow({widt: 200, height: 150});
+  win = new BrowserWindow({widt: 400, height: 300});
   win.loadURL('file://' + __dirname + '/index.html');
 
   win.webContents.openDevTools();

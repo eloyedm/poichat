@@ -15,14 +15,18 @@
       <form  action="" >
         <input id="m" autocomplete="off"/><button>Send</button>
       </form>
-
-      <button type="button" id="callBtn" name="button">Llamar</button>
     </div>
-     <video autoplay id="local"></video>
+    <video autoplay id="local"></video>
 
     <video autoplay id="pantalla"></video>
-    <button type="button" id="login" name="button">Login</button>
-
+    <div class="login">
+      <input type="text" name="name" id="userName" value="">
+      <button type="button" id="login" name="button">Login</button>
+    </div>
+    <div class="call">
+      <input type="text" name="name" id="callUser" value="">
+      <button type="button" name="button" id="callBtn" >Call</button>
+    </div>
     <script>
     var $ = global.jQuery = require('./node_modules/jquery/dist/jquery.js');
     const ipcRenderer = require('electron').ipcRenderer
@@ -31,7 +35,7 @@
     var window = remote.getCurrentWindow()
     //
     var socket = io('http://localhost:8001');
-    var userName = {name: makeid()}
+    var yourConn;
     // var rtc = require('webrtc.io-client');
     // console.log(rtc);
     // ipcRenderer.on('new-message', (event, arg) => {
@@ -40,6 +44,7 @@
 
 
     $("#login").click(() =>{
+      var userName = {name: $("#userName").val()}
       socket.emit('login', JSON.stringify(userName))
     })
 
@@ -48,19 +53,20 @@
     })
 
     socket.on('login', function(data){
-      console.log(data)
+      handleLogin(data.success);
     })
 
     socket.on('offer', function(data){
+      console.log(data)
       handleOffer(data.offer, data.name)
     })
 
     socket.on('answer', function(data){
-      handleAnswer(data.offer, data.name)
+      handleAnswer(data.answer)
     })
 
-    socket.on('offer', function(data){
-      handleOffer(data.offer, data.name)
+    socket.on('candidate', function(data){
+      handleCandidate(data.candidate)
     })
 
 
@@ -74,50 +80,80 @@
       return false;
     });
 
-    // 'use strict';
-    // navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedua;
-    // //
-    // var constraints = {
-    //   audio: false,
-    //   video: true
-    // };
-    //
-    // var video = $("#local");
-    // //
-    // function successCallback(stream){
-    //   window.stream = stream;
-    //   if(window.URL) {
-    //     video.src = URL.createObjectURL(stream);
-    //
-    //     var configuration = {
-    //       "iceServers": [{ "url" : "nel"}]
-    //     }
-    //
-    //     yourConn = new webkitRTCPeerConnection(configuration)
-    //
-    //     yourConn.addStream(stream)
-    //     yourConn.onaddstream = function (e) {
-    //       $("#pantalla").src = window.URL.createObjectURL(e.stream);
-    //     }
-    //
-    //     yourConn.onicecandidate = function(event){
-    //       if(event.candidate){
-    //         socket.emit('candidate', {"candidate": event.candidate})
-    //       }
-    //     }
-    //     socket.emit('video-frame', video.src);
-    //   }else{
-    //     console.log(stream)
-    //     video.src = stream;
-    //   }
-    // }
-    //
-    // function errorCallback(error){
-    //   console.log('navigator.getUserMedia erro: ', error);
-    // }
-    //
-    // navigator.getUserMedia(constraints, successCallback, errorCallback);
+    $("#callBtn").click(function(){
+      var friend = $("#callUser").val();
+      if(friend.length > 0 ){
+        yourConn.createOffer(
+          function(offer){
+            var newfriend = {name: friend, offer: offer};
+            console.log(newfriend);
+            socket.emit('offer', JSON.stringify(newfriend));
+            yourConn.setLocalDescription(offer);
+          },
+          function(error){
+            console.log(error);
+          });
+      }
+      else{
+        alert("Por favor escribe el nombre de tu amigo");
+      }
+    });
 
+    function handleLogin(success){
+      navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedua;
+      //
+      var constraints = {
+        audio: false,
+        video: true
+      };
+
+      var video = $("#local");
+      //
+      function successCallback(stream){
+        window.stream = stream;
+          $("#local").attr("src", window.URL.createObjectURL(stream));
+
+          var configuration = {
+            "iceServers": [{ "url" : "stun:stun2.1.google.com:19302"}]
+          }
+
+          yourConn = new webkitRTCPeerConnection(configuration)
+
+          yourConn.addStream(stream)
+          yourConn.onaddstream = function (e) {
+            $("#pantalla").attr("src",window.URL.createObjectURL(e.stream));
+          }
+
+          yourConn.onicecandidate = function(event){
+            if(event.candidate){
+              socket.emit('candidate', {"candidate": event.candidate})
+            }
+          }
+      }
+
+      function errorCallback(error){
+        console.log('navigator.getUserMedia erro: ', error);
+      }
+
+      navigator.getUserMedia(constraints, successCallback, errorCallback);
+    }
+
+    function handleOffer(offer, name){
+      yourConn.setRemoteDescription(new RTCSessionDescription(offer));
+      yourConn.createAnswer(function(answer){
+        yourConn.setLocalDescription(answer);
+        var newAnswer = {name: name, answer: answer};
+        socket.emit('answer', JSON.stringify(newAnswer));
+      })
+    }
+
+    function handleAnswer(answer){
+      yourConn.setRemoteDescription(new RTCSessionDescription(answer));
+    }
+
+    function handleCandidate(candidate){
+      yourConn.addIceCandidate(new RTCIceCandidate(candidate));
+    }
 
     function makeid()
     {

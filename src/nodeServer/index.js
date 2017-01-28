@@ -44,10 +44,12 @@ io.on('connection', function(socket){
 
   socket.on('offer', function(msg){
     var data = validateMessage(msg)
+    console.log(data.name);
     if(data){
       var conn = users[data.name];
       if(conn != null){
         chats.push(data.name)
+        console.log(data.name);
         socket.broadcast.to(users[data.name]).emit('offer', {
           offer: data.offer,
           name: socket.name
