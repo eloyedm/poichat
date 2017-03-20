@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>POI</title>
+    <!-- <script src="./node_modules/jquery/dist/jquery.js"></script> -->
+  </head>
+  <body>
+    <div class="mensajes">
+      <!-- <div class="cubito" style="width: 10px; height: 10px; background:black; position:absolute;">
+
+      </div> -->
+      <canvas id="canvaspot" width="300" height="300"></canvas>
+      <ul id="messages"></ul>
+        <input id="m" autocomplete="off"/><button id="send">Send</button>
+
+    </div>
+    <video autoplay id="local"></video>
+
+    <video autoplay id="pantalla"></video>
+    <div class="login">
+      <input type="text" name="name" id="userName" value="">
+      <button type="button" id="login" name="button">Login</button>
+    </div>
+    <div class="call">
+      <input type="text" name="name" id="callUser" value="">
+      <button type="button" name="button" id="callBtn" >Call</button>
+    </div>
+    <script>
+    // var $ = global.jQuery = require('./node_modules/jquery/dist/jquery.js');
+    // const ipcRenderer = require('electron').ipcRenderer
+    // var io = require('./node_modules/socket.io-client/dist/socket.io.js')
+    // const remote = require("electron").remote
+    // var window = remote.getCurrentWindow()
+    // //
+    // var socket = io('http://localhost:8001');
+    // var yourConn;
+    // // var rtc = require('webrtc.io-client');
+    // // console.log(rtc);
+    // // ipcRenderer.on('new-message', (event, arg) => {
+    // //    $('#messages').append($('<li>').text(arg))
+    // // })
+    //
+    //
+    // $("#login").click(() =>{
+    //   var userName = {name: $("#userName").val()}
+    //   socket.emit('login', JSON.stringify(userName))
+    // })
+    //
+    // socket.on('chat message', function(msg){
+    //   $('#messages').append($('<li>').text(msg));
+    // })
+    //
+    // socket.on('login', function(data){
+    //   handleLogin(data.success);
+    // })
+    //
+    // socket.on('offer', function(data){
+    //   console.log(data)
+    //   handleOffer(data.offer, data.name)
+    // })
+    //
+    // socket.on('answer', function(data){
+    //   handleAnswer(data.answer)
+    // })
+    //
+    // socket.on('candidate', function(data){
+    //   handleCandidate(data.candidate)
+    // })
+    //
+    //
+    // $('#send').submit((e) => {
+    //   // ipcRenderer.send('response-message', $('#m').val());
+    //   console.log("si jala")
+    //
+    //   var msg = {
+    //     message: $('#m').val()
+    //   }
+    //   socket.emit('chat message', JSON.stringify(msg));
+    //   $('#m').val('');
+    //   return false;
+    // });
+    //
+    // $("#callBtn").click(function(){
+    //   var friend = $("#callUser").val();
+    //   if(friend.length > 0 ){
+    //     yourConn.createOffer(
+    //       function(offer){
+    //         var newfriend = {name: friend, offer: offer};
+    //         console.log(newfriend);
+    //         socket.emit('offer', JSON.stringify(newfriend));
+    //         yourConn.setLocalDescription(offer);
+    //       },
+    //       function(error){
+    //         console.log(error);
+    //       });
+    //   }
+    //   else{
+    //     alert("Por favor escribe el nombre de tu amigo");
+    //   }
+    // });
+    //
+    // function handleLogin(success){
+    //   navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedua;
+    //   //
+    //   var constraints = {
+    //     audio: false,
+    //     video: true
+    //   };
+    //
+    //   var video = $("#local");
+    //   //
+    //   function successCallback(stream){
+    //     window.stream = stream;
+    //       $("#local").attr("src", window.URL.createObjectURL(stream));
+    //
+    //       var configuration = {
+    //         "iceServers": [{ "url" : "stun:stun2.1.google.com:19302"}]
+    //       }
+    //
+    //       yourConn = new webkitRTCPeerConnection(configuration)
+    //
+    //       yourConn.addStream(stream)
+    //       yourConn.onaddstream = function (e) {
+    //         $("#pantalla").attr("src",window.URL.createObjectURL(e.stream));
+    //       }
+    //
+    //       yourConn.onicecandidate = function(event){
+    //         if(event.candidate){
+    //           socket.emit('candidate', {"candidate": event.candidate})
+    //         }
+    //       }
+    //   }
+    //
+    //   function errorCallback(error){
+    //     console.log('navigator.getUserMedia erro: ', error);
+    //   }
+    //
+    //   navigator.getUserMedia(constraints, successCallback, errorCallback);
+    // }
+    //
+    // function handleOffer(offer, name){
+    //   yourConn.setRemoteDescription(new RTCSessionDescription(offer));
+    //   yourConn.createAnswer(function(answer){
+    //     yourConn.setLocalDescription(answer);
+    //     var newAnswer = {name: name, answer: answer};
+    //     socket.emit('answer', JSON.stringify(newAnswer));
+    //   })
+    // }
+    //
+    // function handleAnswer(answer){
+    //   yourConn.setRemoteDescription(new RTCSessionDescription(answer));
+    // }
+    //
+    // function handleCandidate(candidate){
+    //   yourConn.addIceCandidate(new RTCIceCandidate(candidate));
+    // }
+    //
+    // function makeid()
+    // {
+    //   var text = "";
+    //   var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    //
+    //   for( var i=0; i < 15; i++ )
+    //       text += possible.charAt(Math.floor(Math.random() * possible.length));
+    //
+    //   return text;
+    // }
+    </script>
+
+    <script type="text/javascript" src="/bundles/main.bundle.js"> </script>
+  </body>
+</html>

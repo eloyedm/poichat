@@ -36,6 +36,9 @@
     //
     var socket = io('http://localhost:8001');
     var yourConn;
+    var stream;
+    var name;
+    var connectedUser;
     // var rtc = require('webrtc.io-client');
     // console.log(rtc);
     // ipcRenderer.on('new-message', (event, arg) => {
@@ -83,6 +86,7 @@
     $("#callBtn").click(function(){
       var friend = $("#callUser").val();
       if(friend.length > 0 ){
+        connectedUser= friend;
         yourConn.createOffer(
           function(offer){
             var newfriend = {name: friend, offer: offer};
@@ -139,11 +143,14 @@
     }
 
     function handleOffer(offer, name){
+      connectedUser = name;
       yourConn.setRemoteDescription(new RTCSessionDescription(offer));
       yourConn.createAnswer(function(answer){
-        yourConn.setLocalDescription(answer);
-        var newAnswer = {name: name, answer: answer};
-        socket.emit('answer', JSON.stringify(newAnswer));
+      yourConn.setLocalDescription(answer)
+          var newAnswer = {'name': name, 'answer': answer};
+          socket.emit('answer', JSON.stringify(newAnswer));
+      }, function(error){
+        alert("Error en respuesta")
       })
     }
 

@@ -19,9 +19,11 @@ app.get('/', function(req, res){
 
 io.on('connection', function(socket){
   var chats = []
+  console.log(socket);
   socket.on('chat message', function(msg){
     try {
        data = JSON.parse(msg);
+       console.log(msg)
        io.emit('chat message', data.message);
     } catch (e) {
        console.log("Invalid JSON");
@@ -40,6 +42,7 @@ io.on('connection', function(socket){
         socket.emit('login', {success: true,})
       }
     }
+    console.log(users)
   })
 
   socket.on('offer', function(msg){
@@ -61,6 +64,7 @@ io.on('connection', function(socket){
   socket.on('answer', function(msg){
     var data = validateMessage(msg)
     if(data){
+      console.log(data)
       var conn = users[data.name]
       if(conn != null){
         chats.push(data.name)
