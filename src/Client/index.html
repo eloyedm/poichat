@@ -39,6 +39,7 @@
     var stream;
     var name;
     var connectedUser;
+    var userName;
     // var rtc = require('webrtc.io-client');
     // console.log(rtc);
     // ipcRenderer.on('new-message', (event, arg) => {
@@ -47,7 +48,7 @@
 
 
     $("#login").click(() =>{
-      var userName = {name: $("#userName").val()}
+      userName = {name: $("#userName").val()}
       socket.emit('login', JSON.stringify(userName))
     })
 
@@ -69,6 +70,7 @@
     })
 
     socket.on('candidate', function(data){
+      console.log(data);
       handleCandidate(data.candidate)
     })
 
@@ -118,7 +120,7 @@
           $("#local").attr("src", window.URL.createObjectURL(stream));
 
           var configuration = {
-            "iceServers": [{ "url" : "stun:stun2.1.google.com:19302"}]
+            "iceServers": [{ "urls" : "stun:stun.l.google.com:19302"}]
           }
 
           yourConn = new webkitRTCPeerConnection(configuration)
@@ -130,8 +132,14 @@
 
           yourConn.onicecandidate = function(event){
             if(event.candidate){
-              socket.emit('candidate', {"candidate": event.candidate})
+              console.log("aqui se envia el candidate ", event.candidate)
+              socket.emit('candidate', {
+                name: $("#callUser").val(),
+                candidate: event.candidate})
             }
+          }
+          yourConn.oniceconnectionstatechange = function(){
+            console.log('ICE stare:', yourConn.iceConnectionState);
           }
       }
 
@@ -147,6 +155,7 @@
       yourConn.setRemoteDescription(new RTCSessionDescription(offer));
       yourConn.createAnswer(function(answer){
       yourConn.setLocalDescription(answer)
+          console.log("llamada de: ", name)
           var newAnswer = {'name': name, 'answer': answer};
           socket.emit('answer', JSON.stringify(newAnswer));
       }, function(error){
@@ -159,6 +168,7 @@
     }
 
     function handleCandidate(candidate){
+      console.log(candidate)
       yourConn.addIceCandidate(new RTCIceCandidate(candidate));
     }
 

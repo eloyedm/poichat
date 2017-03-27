@@ -19,14 +19,11 @@ app.get('/', function(req, res){
 
 io.on('connection', function(socket){
   var chats = []
-  console.log(socket);
   socket.on('chat message', function(msg){
     try {
        data = JSON.parse(msg);
-       console.log(msg)
        io.emit('chat message', data.message);
     } catch (e) {
-       console.log("Invalid JSON");
        data = {};
     }
   });
@@ -42,17 +39,14 @@ io.on('connection', function(socket){
         socket.emit('login', {success: true,})
       }
     }
-    console.log(users)
   })
 
   socket.on('offer', function(msg){
     var data = validateMessage(msg)
-    console.log(data.name);
     if(data){
       var conn = users[data.name];
       if(conn != null){
         chats.push(data.name)
-        console.log(data.name);
         socket.broadcast.to(users[data.name]).emit('offer', {
           offer: data.offer,
           name: socket.name
@@ -64,7 +58,6 @@ io.on('connection', function(socket){
   socket.on('answer', function(msg){
     var data = validateMessage(msg)
     if(data){
-      console.log(data)
       var conn = users[data.name]
       if(conn != null){
         chats.push(data.name)
@@ -77,14 +70,22 @@ io.on('connection', function(socket){
 
   socket.on('candidate', function(msg){
     var data = validateMessage(msg)
-    if(data){
-      var conn = users(data.name);
+    console.log("aqui llega un candidate primero")
+    console.log(msg.name)
+    // if(data){
+      var conn = users[msg.name]
       if(conn != null){
-        socket.broadcast.to(users[data.name]).emit('candidate', {
-          candidate: data.candidate
-        })
+        console.log("se envia el candidate")
+        socket.broadcast.to(users[msg.name]).emit(
+          'candidate', {
+          candidate: msg.candidate
+        });
+        console.log("si se envia el ice candidate");
       }
-    }
+      else{
+        console.log("noe sta entrando");
+      }
+    // }
   })
 
   socket.on('video-frame', function(msg){
