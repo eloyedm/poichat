@@ -10,6 +10,7 @@
   "author": "Eloy Diaz",
   "license": "ISC",
   "dependencies": {
+    "blueimp-md5": "^2.7.0",
     "emoticons": "git+https://github.com/kof/emoticons.git",
     "jquery": "^3.1.1",
     "remote": "^0.2.6",

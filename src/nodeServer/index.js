@@ -1,16 +1,16 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-// var mysql require('mysql');
-// var dbConnection = mysql.createConnection({
-//   host     : 'localhost',
-//   user     : 'root',
-//   password : '',
-//   database : 'my_db'
-// });
-//
-//
-// dbConnection.connect("");
+var mysql = require('mysql');
+var dbConnection = mysql.createConnection({
+  host     : 'localhost',
+  user     : 'root',
+  password : 'homecoming96',
+  database : 'senses'
+});
+
+
+dbConnection.connect("");
 
 // var webRTC = require('webrtc.io').listen(http);
 
@@ -26,6 +26,11 @@ http.listen(8001, function(){
 
 app.get('/', function(req, res){
   res.sendFile(__dirname +'/index.html');
+})
+
+app.use('/login', function(req, res){
+  console.log(req.method);
+  // res.sendFile(__dirname +'/index.html');
 })
 
 io.on('connection', function(socket){
