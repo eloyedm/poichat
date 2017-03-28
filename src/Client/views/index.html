@@ -27,6 +27,7 @@
       <input type="text" name="name" id="callUser" value="">
       <button type="button" name="button" id="callBtn" >Call</button>
     </div>
+    <script type="text/javascript"src="conversation.js"></script>
     <script>
     var $ = global.jQuery = require('./node_modules/jquery/dist/jquery.js');
     const ipcRenderer = require('electron').ipcRenderer
@@ -40,6 +41,9 @@
     var name;
     var connectedUser;
     var userName;
+    var emoticons = require('emoticons');
+    var definition = {smile:{title:"Smile",codes:[":)",":=)",":-)"]}};
+    emoticons.define(definition);
     // var rtc = require('webrtc.io-client');
     // console.log(rtc);
     // ipcRenderer.on('new-message', (event, arg) => {
@@ -53,6 +57,7 @@
     })
 
     socket.on('chat message', function(msg){
+      msg =  emoticons.replace(msg);
       $('#messages').append($('<li>').text(msg));
     })
 
@@ -109,7 +114,7 @@
       navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedua;
       //
       var constraints = {
-        audio: false,
+        audio: true,
         video: true
       };
 

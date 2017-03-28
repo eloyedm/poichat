@@ -2,7 +2,7 @@ const {app, BrowserWindow} = require('electron')
 const {ipcMain} = require('electron')
 const path = require('path');
 const url = require('url');
-const Backbone = require('backbone')
+// const Backbone = require('backbone')
 // var WebSocket = require('ws');
 
 
@@ -11,8 +11,8 @@ let win;
 
 function createWindow() {
   win = new BrowserWindow({widt: 800, height: 600});
-  win.loadURL('file://' + __dirname + '/index.html');
-  
+  win.loadURL('file://' + __dirname + '/views/index.html');
+
   win.webContents.openDevTools();
 
   win.on('closed', () =>{
