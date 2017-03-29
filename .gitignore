@@ -1,3 +1,7 @@
 /vendor/
 /node_modules/
 ./src/nodeClient/node_modules/
+src/nodeServer/node_modules/
+src/nodeClient/node_modules/
+src/Client/frontend/node_modules/
+src/Client/frontend/bower_components/

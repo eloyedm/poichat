@@ -17,7 +17,9 @@ app.get('/', function(req, res){
   res.sendFile(__dirname +'/index.html');
 })
 
-app.use('/bundles',express.static('bundles'))
+app.use('/bundles',express.static('bundles'));
+app.use('/css', express.static('css'));
+app.use('/resources', express.static('resources'));
 
 // webRTC.rtc.on('chat_msg', (data, socket) => {
 //   var roomList = webRTC.rtc.rooms[data.room] || [];

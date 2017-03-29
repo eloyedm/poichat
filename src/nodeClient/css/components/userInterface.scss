@@ -1,0 +1,21 @@
+div.userInterface{
+  width: 300px;
+  max-width: 300px;
+  min-width: 300px;
+  height: 936px;
+  max-height: 936px;
+  min-height: 936px;
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  background-color: #039be6;
+  img{
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    fill: #fff
+  }
+}

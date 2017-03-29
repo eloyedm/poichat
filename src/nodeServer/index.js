@@ -1,16 +1,16 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var mysql = require('mysql');
+/*var mysql = require('mysql');
 var dbConnection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
   password : 'homecoming96',
   database : 'senses'
 });
+*/
 
-
-dbConnection.connect("");
+//dbConnection.connect("");
 
 // var webRTC = require('webrtc.io').listen(http);
 
