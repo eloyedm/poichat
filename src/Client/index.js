@@ -11,7 +11,7 @@ let win;
 
 function createWindow() {
   win = new BrowserWindow({widt: 800, height: 600});
-  win.loadURL('file://' + __dirname + '/views/login.html');
+  win.loadURL('file://' + __dirname + '/views/index.html');
 
   win.webContents.openDevTools();
 

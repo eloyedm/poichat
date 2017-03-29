@@ -108,6 +108,21 @@ io.on('connection', function(socket){
     io.emit('video-frame', msg);
   })
 
+  socket.on('buzz', function(msg){
+    var data = validateMessage(msg)
+    if(data){
+      if(users[data.name]){
+        console.log("aqui deberia entrar", users[data.name]);
+        console.log(users);
+        socket.broadcast.to(users[data.name]).emit('buzz', {buzz: "pzzzzz"})
+      } else {
+        console.log(users[socket.name])
+        socket.broadcast.to(users[socket.name]).emit('notHere', {
+          error: "No es posible realizar el zumbido en este momento"
+        })
+      }
+    }
+  })
 })
 
 function validateMessage(msg){
