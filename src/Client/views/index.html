@@ -13,21 +13,20 @@
       <!-- <div class="cubito" style="width: 10px; height: 10px; background:black; position:absolute;">
 
       </div> -->
-      <canvas id="canvaspot" width="300" height="300"></canvas>
+      <input type="text" name="name" id="callUser" value="">
       <ul id="messages"></ul>
       <form  action="" >
         <input id="m" autocomplete="off"/><button>Send</button>
       </form>
     </div>
-    <video autoplay id="local"></video>
+    <video autoplay style="display:none;" id="local"></video>
 
-    <video autoplay id="pantalla"></video>
+    <video autoplay style="display:none;" id="pantalla"></video>
     <div class="login">
       <input type="text" name="name" id="userName" value="">
       <button type="button" id="login" name="button">Login</button>
     </div>
     <div class="call">
-      <input type="text" name="name" id="callUser" value="">
       <button type="button" name="button" id="callBtn" >Call</button>
       <button type="button" name="buzz" id="buzz">Zumbido</button>
     </div>
@@ -149,8 +148,13 @@
     })
 
     socket.on('chat message', function(msg){
-      msg =  emoticons.replace(msg);
-      $('#messages').append($('<li>').html(msg));
+      console.log(msg)
+      var pMsg =  emoticons.replace(msg.message);
+      var newMessage = $("<li>", {
+        class: msg.origin,
+        html: pMsg
+      })
+      $('#messages').append(newMessage);
     })
 
     socket.on("buzz", function(){
@@ -183,9 +187,12 @@
 
     $('form').submit(() => {
       // ipcRenderer.send('response-message', $('#m').val());
+      var destination = $("#callUser").val()
       var msg = {
+        name: destination,
         message: $('#m').val()
       }
+      console.log(msg);
       socket.emit('chat message', JSON.stringify(msg));
       $('#m').val('');
       return false;

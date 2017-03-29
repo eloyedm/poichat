@@ -38,7 +38,29 @@ io.on('connection', function(socket){
   socket.on('chat message', function(msg){
     try {
        data = JSON.parse(msg);
-       io.emit('chat message', data.message);
+       if(data.name != ""){
+         if(users[data.name]){
+           socket.broadcast.to(users[data.name]).emit('chat message', {
+             origin: "other",
+             message: data.message
+           })
+           socket.broadcast.to(users[socket.name]).emit('chat message', {
+             origin: "own",
+             message: data.message
+           })
+         }
+         else{
+           socket.broadcast.to(users[socket.name]).emit('notHere', {
+              error: "No es posible entregar el mensaje en este momento"
+           })
+         }
+       }
+       else{
+         io.emit('chat message',{
+           origin: "group",
+           message: data.message
+         });
+       }
     } catch (e) {
        data = {};
     }
