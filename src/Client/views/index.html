@@ -11,18 +11,15 @@
     <audio id="buzzSound" src="./../audio/msn_nudge_sound.mp3" style="display:none;">
     </audio>
     <div class="mensajes">
-      <!-- <div class="cubito" style="width: 10px; height: 10px; background:black; position:absolute;">
-
-      </div> -->
       <input type="text" name="name" id="callUser" value="">
       <ul id="messages"></ul>
       <form  action="" >
         <input id="m" autocomplete="off"/><button>Send</button>
       </form>
     </div>
-    <video autoplay style="display:none;" id="local"></video>
+    <video autoplay id="local"></video>
 
-    <video autoplay style="display:none;" id="pantalla"></video>
+    <video autoplay id="pantalla"></video>
     <div class="login">
       <input type="text" name="name" id="userName" value="">
       <button type="button" id="login" name="button">Login</button>
@@ -31,7 +28,6 @@
       <button type="button" name="button" id="callBtn" >Call</button>
       <button type="button" name="buzz" id="buzz">Zumbido</button>
     </div>
-    <!-- <script type="text/javascript"src="conversation.js"></script> -->
     <script>
     var $ = global.jQuery = require('./../node_modules/jquery/dist/jquery.js');
     const ipcRenderer = require('electron').ipcRenderer

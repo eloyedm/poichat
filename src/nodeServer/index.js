@@ -1,6 +1,11 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var bodyParser = require('body-parser')
+app.use( bodyParser.json() );       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+  extended: true
+}));
 /*var mysql = require('mysql');
 var dbConnection = mysql.createConnection({
   host     : 'localhost',
@@ -28,13 +33,16 @@ app.get('/', function(req, res){
   res.sendFile(__dirname +'/index.html');
 })
 
-app.use('/login', function(req, res){
-  console.log(req.method);
+app.post('/login', function(req, res){
+  //authentication with te db
+  console.log(req.body.nameUser)
+  res.json({user: req.body.nameUser})
   // res.sendFile(__dirname +'/index.html');
 })
 
 io.on('connection', function(socket){
   var chats = []
+  console.log(socket)
   socket.on('chat message', function(msg){
     try {
        data = JSON.parse(msg);
@@ -108,17 +116,13 @@ io.on('connection', function(socket){
 
   socket.on('candidate', function(msg){
     var data = validateMessage(msg)
-    console.log("aqui llega un candidate primero")
-    console.log(msg.name)
     // if(data){
       var conn = users[msg.name]
       if(conn != null){
-        console.log("se envia el candidate")
         socket.broadcast.to(users[msg.name]).emit(
           'candidate', {
           candidate: msg.candidate
         });
-        console.log("si se envia el ice candidate");
       }
       else{
         console.log("noe sta entrando");
