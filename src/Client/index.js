@@ -7,10 +7,10 @@ const url = require('url');
 
 
 let win;
-
+var chats = [];
 
 function createWindow() {
-  win = new BrowserWindow({widt: 800, height: 600});
+  win = new BrowserWindow({width: 800, height: 600});
   win.loadURL('file://' + __dirname + '/views/login.html');
 
   win.webContents.openDevTools();
@@ -32,6 +32,12 @@ app.on('activate', () => {
   if(win === null){
     createWindow()
   }
+})
+
+ipcMain.on('new-chat', (event, arg) => {
+  var newChat = new BrowserWindow({width: 800, height: 600});
+  newChat.loadURL('file://'+__dirname+'/views/index.html');
+  chats.push[newChat]
 })
 
 // var conn = new WebSocket('ws://localhost:8080');

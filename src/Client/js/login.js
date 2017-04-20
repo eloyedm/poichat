@@ -8,17 +8,23 @@ var md5 = require('./../node_modules/blueimp-md5/js/md5.min.js')
 function chatWindow(){
   this.userName = '';
   this.render = function(data){
+    var docBody = $("body");
     var mainContainer = $("<div />", {
       class: "mainContainer"
     });
-    console.log(data);
+
     var userTitle = $("<div />", {
       class: "userTitle",
       text: data.user
     });
 
+    for (var person in people) {
+      console.log(person);
+    }
+
     mainContainer.append(userTitle);
-    $("body").append(mainContainer);
+    docBody.empty();
+    docBody.append(mainContainer);
   }
 }
 

@@ -10,7 +10,7 @@ var mysql = require('mysql');
 var dbConnection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : '',
+  password : 'homecoming96',
   database : 'senses'
 });
 
@@ -50,7 +50,11 @@ app.post("/register", function(req, res){
 app.post('/login', function(req, res){
   //authentication with te db
   if(check(req.body.nameUser, req.body.pass)){
-    res.json({user: req.body.nameUser})
+    console.log("si puedes loggear");
+
+    var available = getAvailableUsers(req.body.nameUser);
+    console.log(available)
+    res.json({user: req.body.nameUser, people: available})
   }
   else{
     res.status(401).end();
@@ -217,7 +221,7 @@ function setOnline(name){
 }
 
 function getAvailableUsers(name){
-  return dbConnection.query('SELECT name FROM users HWERE name != ? AND online == true', [name], function(error, results, fields){
+  var users = dbConnection.query('SELECT name FROM users WHERE name != ? AND online = 1', [name], function(error, results, fields){
     if(error){
       throw error
     }
@@ -225,6 +229,7 @@ function getAvailableUsers(name){
       return results
     }
   })
+  return users
 }
 // webRTC.rtc.on('chat_msg', (data, socket) => {
 //   var roomList = webRTC.rtc.rooms[data.room] || [];
