@@ -26,8 +26,6 @@ $(document).ready(function(){
   $(".startRegister").click(function(){
     $(".form").toggle("slow");
   })
-
-  console.log()
   $("#enviarLogin").click(function(event){
     event.stopPropagation();
     var codedPass = md5($("#password").val());
@@ -39,8 +37,33 @@ $(document).ready(function(){
         pass: codedPass
       },
       success: function(data){
-        console.log(data);
+        alert("Bienvenido "+ data.user);
         seeChats(data);
+      },
+      error: function(){
+        alert("Lo sentimos, el usuario o contraseña son incorrectos");
+      }
+    })
+  })
+
+  $("#enviarRegistro").click(function(event){
+    event.stopPropagation();
+    var codedPass = md5($("#newPassword").val());
+    var userName = $("#newUser").val();
+    var email = $("#email").val();
+    $.ajax({
+      method: "POST",
+      url: "http://localhost:8001/register",
+      data: {
+        userName: userName,
+        password: codedPass,
+        email: email
+      },
+      success: function(data){
+        seeChats(data);
+      },
+      error: function(){
+        alert('Este usuario ya existe');
       }
     })
   })

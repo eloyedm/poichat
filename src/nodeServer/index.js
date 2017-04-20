@@ -6,14 +6,13 @@ app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 }));
-/*var mysql = require('mysql');
+var mysql = require('mysql');
 var dbConnection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : 'homecoming96',
+  password : '',
   database : 'senses'
 });
-*/
 
 //dbConnection.connect("");
 
@@ -33,11 +32,29 @@ app.get('/', function(req, res){
   res.sendFile(__dirname +'/index.html');
 })
 
+app.post("/register", function(req, res){
+  var userName = req.body.userName
+  var password = req.body.password
+  var email = req.body.email
+
+  dbConnection.query('SELECT * FROM users WHERE name = ?',[userName], function(error, results, fields){
+    if(results.length == 0){
+      registerUser(userName, password, email)
+    }
+    else{
+      res.status(401).end();
+    }
+  })
+})
+
 app.post('/login', function(req, res){
   //authentication with te db
-  console.log(req.body.nameUser)
-  res.json({user: req.body.nameUser})
-  // res.sendFile(__dirname +'/index.html');
+  if(check(req.body.nameUser, req.body.pass)){
+    res.json({user: req.body.nameUser})
+  }
+  else{
+    res.status(401).end();
+  }
 })
 
 io.on('connection', function(socket){
@@ -161,6 +178,54 @@ function validateMessage(msg){
   }
 }
 
+function registerUser(name, password, email){
+  var parameters = {name: name, password: password, email: email}
+  return dbConnection.query('INSERT INTO users SET ?', parameters, function(error, results, fields){
+    if(error)
+    {
+      throw error
+    }
+    else{
+      return true
+    }
+  })
+}
+
+function check(name, password){
+  var parameters = [name, password]
+  return dbConnection.query('SELECT name FROM users WHERE name = ? AND password = ?', parameters, function(error, results, fields){
+    if(results.length == 0)
+    {
+      throw error
+    }
+    else{
+      setOnline(name);
+      return true
+    }
+  })
+}
+
+function setOnline(name){
+  return dbConnection.query('UPDATE users SET online = true WHERE name = ?', [name], function(error, results, fields){
+    if(error){
+      throw error
+    }
+    else{
+      return true
+    }
+  })
+}
+
+function getAvailableUsers(name){
+  return dbConnection.query('SELECT name FROM users HWERE name != ? AND online == true', [name], function(error, results, fields){
+    if(error){
+      throw error
+    }
+    else{
+      return results
+    }
+  })
+}
 // webRTC.rtc.on('chat_msg', (data, socket) => {
 //   var roomList = webRTC.rtc.rooms[data.room] || [];
 //   for(var i = 0; i < roomList.length; i++){
