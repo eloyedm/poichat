@@ -10,7 +10,7 @@ var mysql = require('mysql');
 var dbConnection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : 'homecoming96',
+  password : '',
   database : 'senses'
 });
 
@@ -50,11 +50,10 @@ app.post("/register", function(req, res){
 app.post('/login', function(req, res){
   //authentication with te db
   if(check(req.body.nameUser, req.body.pass)){
-    console.log("si puedes loggear");
-
-    var available = getAvailableUsers(req.body.nameUser);
-    console.log(available)
-    res.json({user: req.body.nameUser, people: available})
+    dbConnection.query('SELECT name FROM users WHERE name != ? AND online = 1', [req.body.nameUser], function(error, results, fields){
+      console.log(results);
+      res.json({user: req.body.nameUser, people: results});
+    });
   }
   else{
     res.status(401).end();

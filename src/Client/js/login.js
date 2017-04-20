@@ -1,5 +1,5 @@
 var $ = global.jQuery = require('./../node_modules/jquery/dist/jquery.js');
-const ipcRenderer = require('electron').ipcRenderer
+const renderer = require('electron').ipcRenderer
 var io = require('./../node_modules/socket.io-client/dist/socket.io.js')
 const remote = require("electron").remote
 var window = remote.getCurrentWindow()
@@ -18,13 +18,17 @@ function chatWindow(){
       text: data.user
     });
 
-    for (var person in people) {
-      console.log(person);
+    for (person of data.people) {
+            console.log(person);
     }
 
     mainContainer.append(userTitle);
     docBody.empty();
     docBody.append(mainContainer);
+
+    $(".mainContainer").click(function(){
+      renderer.send('new-chat', data.user);
+    })
   }
 }
 
@@ -76,6 +80,7 @@ $(document).ready(function(){
 
   function seeChats(data){
     var chats = new chatWindow();
+    console.log(data);
     chats.render(data);
   }
 })

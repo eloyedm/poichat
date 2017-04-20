@@ -8,6 +8,7 @@ const url = require('url');
 
 let win;
 var chats = [];
+var currentUser = '';
 
 function createWindow() {
   win = new BrowserWindow({width: 800, height: 600});
@@ -37,7 +38,13 @@ app.on('activate', () => {
 ipcMain.on('new-chat', (event, arg) => {
   var newChat = new BrowserWindow({width: 800, height: 600});
   newChat.loadURL('file://'+__dirname+'/views/index.html');
+  newChat.webContents.openDevTools();
   chats.push[newChat]
+  currentUser = arg;
+})
+
+ipcMain.on('opened-chat', (event, arg) => {
+  event.sender.send('user-return', currentUser)
 })
 
 // var conn = new WebSocket('ws://localhost:8080');

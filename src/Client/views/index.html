@@ -30,10 +30,14 @@
     </div>
     <script>
     var $ = global.jQuery = require('./../node_modules/jquery/dist/jquery.js');
-    const ipcRenderer = require('electron').ipcRenderer
+    const renderer = require('electron').ipcRenderer
     var io = require('./../node_modules/socket.io-client/dist/socket.io.js')
     const remote = require("electron").remote
     var window = remote.getCurrentWindow()
+    renderer.send('opened-chat', 'ok');
+    renderer.on('user-return', (event, arg) => {
+      console.log(arg);
+    })
     //
     var socket = io('http://localhost:8001');
     var yourConn;
