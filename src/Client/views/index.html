@@ -34,9 +34,10 @@
     var io = require('./../node_modules/socket.io-client/dist/socket.io.js')
     const remote = require("electron").remote
     var window = remote.getCurrentWindow()
+    var friend;
     renderer.send('opened-chat', 'ok');
     renderer.on('user-return', (event, arg) => {
-      console.log(arg);
+      console.log(arg)
     })
     //
     var socket = io('http://localhost:8001');
@@ -45,6 +46,7 @@
     var name;
     var connectedUser;
     var userName;
+
     var emoticons = require('emoticons');
     // var definition = {smile:{title:"Smile",codes:[":)",":=)",":-)"]}};
     var definition = {smile:{title:"Smile",codes:[":)",":=)",":-)"]},
@@ -192,7 +194,6 @@
 
     $('form').submit(() => {
       // ipcRenderer.send('response-message', $('#m').val());
-      var destination = $("#callUser").val()
       var msg = {
         name: destination,
         message: $('#m').val()

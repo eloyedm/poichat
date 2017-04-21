@@ -16,6 +16,9 @@ var userLine = '';
 var returnLine = '';
 var socket = '';
 
+var chatUser = '';
+var friends = [];
+
 function createWindow() {
   win = new BrowserWindow({width: 800, height: 600});
   win.loadURL('file://' + __dirname + '/views/login.html');
@@ -44,6 +47,7 @@ app.on('activate', () => {
 ipcMain.on('succeedLogin', (event, arg) =>{
   console.log(socket)
   userName = {name: arg}
+  chatUser = arg
   watchWindow = new BrowserWindow({parent: win,width: 400, height: 200});
   watchWindow.loadURL('file://' + __dirname + '/views/watch.html');
   watchWindow.webContents.openDevTools();
@@ -55,15 +59,18 @@ ipcMain.on('watch', (event, arg) =>{
 })
 
 ipcMain.on('new-chat', (event, arg) => {
-  var newChat = new BrowserWindow({width: 800, height: 600});
-  newChat.loadURL('file://'+__dirname+'/views/index.html');
-  newChat.webContents.openDevTools();
-  chats.push[newChat]
-  currentUser = arg;
+  currentUser = arg.user
+  if(friends.indexOf(arg.friend) == -1){
+    friends.push[arg.friend]
+    var newChat = new BrowserWindow({width: 800, height: 600});
+    newChat.loadURL('file://'+__dirname+'/views/index.html');
+    newChat.webContents.openDevTools();
+    chats.push[newChat]
+  }
 })
 
 ipcMain.on('opened-chat', (event, arg) => {
-  event.sender.send('user-return', currentUser)
+  event.sender.send('user-return', friend[friend.length-1])
   userLine = event.sender
 })
 

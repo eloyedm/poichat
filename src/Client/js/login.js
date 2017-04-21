@@ -18,16 +18,23 @@ function chatWindow(){
       text: data.user
     });
 
-    for (person of data.people) {
-            console.log(person);
-    }
+    var friends = $("<ul />", {
+      class: "friendsContainer"
+    });
 
+    var friend = "";
+    for (person of data.people) {
+      friend += "<li class='friendContainer' data="+person.name+">"+person.name+"</li>";
+    }
+    friends.html(friend);
+    mainContainer.append(friends);
     mainContainer.append(userTitle);
     docBody.empty();
     docBody.append(mainContainer);
 
-    $(".mainContainer").click(function(){
-      renderer.send('new-chat', data.user);
+    $(".friendContainer").click(function(){
+      var friendName = this.getAttribute('data');
+      renderer.send('new-chat',{user: data.user, friend: friendName} );
     })
   }
 }
