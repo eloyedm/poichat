@@ -150,7 +150,7 @@
 
     renderer.on('chat message', (event, arg) => {
     // socket.on('chat message', function(msg){
-      console.log(msg)
+
       var pMsg =  emoticons.replace(arg.message);
       var newMessage = $("<li>", {
         class: arg.origin,
@@ -175,7 +175,7 @@
       handleOffer(arg.offer, arg.name)
     })
 
-    renderer.on('chat message', (event, arg) => {
+    renderer.on('answer', (event, arg) => {
     // socket.on('answer', function(data){
       handleAnswer(arg.answer)
     })

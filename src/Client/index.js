@@ -2,15 +2,18 @@ const {app, BrowserWindow} = require('electron')
 const {ipcMain} = require('electron')
 const path = require('path');
 const url = require('url');
-var io = require('./node_modules/socket.io-client/dist/socket.io.js')
+var io = require('./node_modules/socket.io-client/dist/socket.io.js');
+console.log(io);
 // const Backbone = require('backbone')
 // var WebSocket = require('ws');
 
 
 let win;
 var chats = [];
+var watchWindow = '';
 var currentUser = '';
 var userLine = '';
+var returnLine = '';
 var socket = '';
 
 function createWindow() {
@@ -39,9 +42,16 @@ app.on('activate', () => {
 })
 
 ipcMain.on('succeedLogin', (event, arg) =>{
-  socket = io('http://localhost:8001');
+  console.log(socket)
   userName = {name: arg}
-  socket.emit('login', JSON.stringify(userName))
+  watchWindow = new BrowserWindow({parent: win,width: 400, height: 200});
+  watchWindow.loadURL('file://' + __dirname + '/views/watch.html');
+  watchWindow.webContents.openDevTools();
+})
+
+ipcMain.on('watch', (event, arg) =>{
+  event.sender.send('login', JSON.stringify(userName))
+  returnLine = event.sender
 })
 
 ipcMain.on('new-chat', (event, arg) => {
@@ -58,43 +68,51 @@ ipcMain.on('opened-chat', (event, arg) => {
 })
 
 ipcMain.on('chat message', (event, arg) => {
-  socket.emit('chat message', arg);
+  // socket.emit('chat message', arg);
+  returnLine.send('chat message', arg);
 })
 
 ipcMain.on('offer', (event, arg) => {
-  socket.emit('offer', arg);
+  // socket.emit('offer', arg);
+  returnLine.send('offer', arg);
 })
 
 ipcMain.on('answer', (event, arg) => {
-  socket.emit('answer', arg);
+  // socket.emit('answer', arg);
+  returnLine.send('answer', arg);
 })
 
 ipcMain.on('buzz', (event, arg) => {
-  socket.emit("buzz", arg);
+  // socket.emit("buzz", arg);
+  returnLine.send('buzz', arg);
 })
 
-ipcMain.on('candidate', (event, arg) => {
-  socket.emit('candidate', arg);
+ipcMain.on('candidate', (event, arg) =>{
+  returnLine.send('candidate', arg);
 })
 
-socket.on('chat message', function(msg){
-  userLine.send('chat message', msg)
+ipcMain.on('chat message-r', (event, arg) => {
+  // socket.emit('chat message', arg);
+  userLine.send('chat message', arg);
 })
 
-socket.on("buzz", function(){
-  userLine.send('buzz', 'ok')
+ipcMain.on('offer-r', (event, arg) => {
+  // socket.emit('offer', arg);
+  userLine.send('offer', arg);
 })
 
-socket.on('offer', function(data){
-  userLine.send('offer', data)
+ipcMain.on('answer-r', (event, arg) => {
+  // socket.emit('answer', arg);
+  userLine.send('answer', arg);
 })
 
-socket.on('answer', function(data){
-  userLine.send('answer', data)
+ipcMain.on('buzz-r', (event, arg) => {
+  // socket.emit("buzz", arg);
+  userLine.send('buzz', arg);
 })
 
-socket.on('candidate', function(data){
-  userLine.send('candidate', function(data))
+ipcMain.on('candidate-r', (event, arg) =>{
+  userLine.send('buzz', arg);
 })
 
 // var conn = new WebSocket('ws://localhost:8080');

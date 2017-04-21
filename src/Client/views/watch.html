@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <script type="text/javascript">
+    const renderer = require('electron').ipcRenderer
+    var io = require('./../node_modules/socket.io-client/dist/socket.io.js')
+    const remote = require("electron").remote
+    var window = remote.getCurrentWindow()
+    var socket = io('http://localhost:8001');
+
+
+    renderer.send('watch', 'ok')
+
+    renderer.on('login', (event, arg) =>{
+      socket.emit('login', arg)
+    })
+    renderer.on('chat message', (event, arg) => {
+      console.log(arg)
+      socket.emit('chat message', arg);
+    })
+
+    renderer.on('buzz', (event, arg) => {
+      socket.emit('buzz', arg);
+    })
+
+    renderer.on('offer', (event, arg) => {
+      socket.emit('offer', arg);
+    })
+
+    renderer.on('answer', (event, arg) => {
+      socket.emit("answer", arg);
+    })
+
+    renderer.on('candidate', (event, arg) => {
+      socket.emit("candidate", arg);
+    })
+
+    socket.on('chat message', function(msg){
+      renderer.send('chat message-r', msg)
+    })
+
+    socket.on("buzz", function(){
+      renderer.send('buzz-r', 'ok')
+    })
+
+    socket.on('offer', function(data){
+      renderer.send('offer-r', data)
+    })
+
+    socket.on('answer', function(data){
+      renderer.send('answer-r', data)
+    })
+
+    socket.on('candidate', function(data){
+      renderer.send('candidate-r', data)
+    })
+    </script>
+  </body>
+</html>

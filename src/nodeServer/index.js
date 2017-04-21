@@ -10,7 +10,7 @@ var mysql = require('mysql');
 var dbConnection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : '',
+  password : 'homecoming96',
   database : 'senses'
 });
 
@@ -51,7 +51,6 @@ app.post('/login', function(req, res){
   //authentication with te db
   if(check(req.body.nameUser, req.body.pass)){
     dbConnection.query('SELECT name FROM users WHERE name != ? AND online = 1', [req.body.nameUser], function(error, results, fields){
-      console.log(results);
       res.json({user: req.body.nameUser, people: results});
     });
   }
@@ -62,11 +61,12 @@ app.post('/login', function(req, res){
 
 io.on('connection', function(socket){
   var chats = []
-  console.log(socket)
   socket.on('chat message', function(msg){
     try {
+      console.log(msg)
        data = JSON.parse(msg);
        if(data.name != ""){
+         console.log(data)
          if(users[data.name]){
            socket.broadcast.to(users[data.name]).emit('chat message', {
              origin: "other",
