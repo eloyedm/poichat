@@ -2,6 +2,7 @@ const {app, BrowserWindow} = require('electron')
 const {ipcMain} = require('electron')
 const path = require('path');
 const url = require('url');
+var io = require('./node_modules/socket.io-client/dist/socket.io.js')
 // const Backbone = require('backbone')
 // var WebSocket = require('ws');
 
@@ -9,6 +10,8 @@ const url = require('url');
 let win;
 var chats = [];
 var currentUser = '';
+var userLine = '';
+var socket = '';
 
 function createWindow() {
   win = new BrowserWindow({width: 800, height: 600});
@@ -35,6 +38,12 @@ app.on('activate', () => {
   }
 })
 
+ipcMain.on('succeedLogin', (event, arg) =>{
+  socket = io('http://localhost:8001');
+  userName = {name: arg}
+  socket.emit('login', JSON.stringify(userName))
+})
+
 ipcMain.on('new-chat', (event, arg) => {
   var newChat = new BrowserWindow({width: 800, height: 600});
   newChat.loadURL('file://'+__dirname+'/views/index.html');
@@ -45,6 +54,47 @@ ipcMain.on('new-chat', (event, arg) => {
 
 ipcMain.on('opened-chat', (event, arg) => {
   event.sender.send('user-return', currentUser)
+  userLine = event.sender
+})
+
+ipcMain.on('chat message', (event, arg) => {
+  socket.emit('chat message', arg);
+})
+
+ipcMain.on('offer', (event, arg) => {
+  socket.emit('offer', arg);
+})
+
+ipcMain.on('answer', (event, arg) => {
+  socket.emit('answer', arg);
+})
+
+ipcMain.on('buzz', (event, arg) => {
+  socket.emit("buzz", arg);
+})
+
+ipcMain.on('candidate', (event, arg) => {
+  socket.emit('candidate', arg);
+})
+
+socket.on('chat message', function(msg){
+  userLine.send('chat message', msg)
+})
+
+socket.on("buzz", function(){
+  userLine.send('buzz', 'ok')
+})
+
+socket.on('offer', function(data){
+  userLine.send('offer', data)
+})
+
+socket.on('answer', function(data){
+  userLine.send('answer', data)
+})
+
+socket.on('candidate', function(data){
+  userLine.send('candidate', function(data))
 })
 
 // var conn = new WebSocket('ws://localhost:8080');

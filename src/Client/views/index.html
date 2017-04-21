@@ -143,47 +143,51 @@
     // })
 
 
-    $("#login").click(() =>{
-      userName = {name: $("#userName").val()}
-      socket.emit('login', JSON.stringify(userName))
-    })
+    // $("#login").click(() =>{
+    //   userName = {name: $("#userName").val()}
+    //   socket.emit('login', JSON.stringify(userName))
+    // })
 
-    socket.on('chat message', function(msg){
+    renderer.on('chat message', (event, arg) => {
+    // socket.on('chat message', function(msg){
       console.log(msg)
-      var pMsg =  emoticons.replace(msg.message);
+      var pMsg =  emoticons.replace(arg.message);
       var newMessage = $("<li>", {
-        class: msg.origin,
+        class: arg.origin,
         html: pMsg
       })
       $('#messages').append(newMessage);
     })
 
-    socket.on("buzz", function(){
+    renderer.on('buzz', (event, arg) => {
+    // socket.on("buzz", function(){
       console.log("si llega")
       $("#buzzSound").trigger('play')
     })
 
-    socket.on('login', function(data){
-      handleLogin(data.success);
+    // renderer.on('chat message', (event, arg) => {
+    // // socket.on('login', function(data){
+    //   handleLogin(data.success);
+    // })
+
+    renderer.on('offer', (event, arg) => {
+    // socket.on('offer', function(data){
+      handleOffer(arg.offer, arg.name)
     })
 
-    socket.on('offer', function(data){
-      console.log(data)
-      handleOffer(data.offer, data.name)
+    renderer.on('chat message', (event, arg) => {
+    // socket.on('answer', function(data){
+      handleAnswer(arg.answer)
     })
 
-    socket.on('answer', function(data){
-      handleAnswer(data.answer)
+    renderer.on('candidate', (event, arg) => {
+    // socket.on('candidate', function(data){
+      handleCandidate(arg.candidate)
     })
-
-    socket.on('candidate', function(data){
-      console.log(data);
-      handleCandidate(data.candidate)
-    })
-
-    socket.on('notHere', function(data){
-      alert(data.error)
-    })
+    //
+    // socket.on('notHere', function(data){
+    //   alert(data.error)
+    // })
 
 
     $('form').submit(() => {
@@ -193,8 +197,8 @@
         name: destination,
         message: $('#m').val()
       }
-      console.log(msg);
-      socket.emit('chat message', JSON.stringify(msg));
+      renderer.send('chat message', JSON.stringify(msg))
+      // socket.emit('chat message', JSON.stringify(msg));
       $('#m').val('');
       return false;
     });
@@ -207,7 +211,8 @@
           function(offer){
             var newfriend = {name: friend, offer: offer};
             console.log(newfriend);
-            socket.emit('offer', JSON.stringify(newfriend));
+            renderer.send('offer', JSON.stringify(newfriend))
+            // socket.emit('offer', JSON.stringify(newfriend));
             yourConn.setLocalDescription(offer);
           },
           function(error){
@@ -223,7 +228,8 @@
       var friend = {
         name: $("#callUser").val()
       };
-      socket.emit("buzz", JSON.stringify(friend));
+      renderer.send("buzz", JSON.stringify(friend))
+      // socket.emit("buzz", JSON.stringify(friend));
     })
 
     function handleLogin(success){
@@ -253,10 +259,13 @@
 
           yourConn.onicecandidate = function(event){
             if(event.candidate){
-              console.log("aqui se envia el candidate ", event.candidate)
-              socket.emit('candidate', {
+              renderer.send('candidate', {
                 name: $("#callUser").val(),
-                candidate: event.candidate})
+                candidate: event.candidate}
+              )
+              // socket.emit('candidate', {
+              //   name: $("#callUser").val(),
+              //   candidate: event.candidate})
             }
           }
           yourConn.oniceconnectionstatechange = function(){
@@ -276,9 +285,9 @@
       yourConn.setRemoteDescription(new RTCSessionDescription(offer));
       yourConn.createAnswer(function(answer){
       yourConn.setLocalDescription(answer)
-          console.log("llamada de: ", name)
           var newAnswer = {'name': name, 'answer': answer};
-          socket.emit('answer', JSON.stringify(newAnswer));
+          renderer.send('answer', JSON.stringify(newAnswer))
+          // socket.emit('answer', JSON.stringify(newAnswer));
       }, function(error){
         alert("Error en respuesta")
       })
@@ -289,7 +298,6 @@
     }
 
     function handleCandidate(candidate){
-      console.log(candidate)
       yourConn.addIceCandidate(new RTCIceCandidate(candidate));
     }
 

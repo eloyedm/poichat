@@ -48,6 +48,7 @@ $(document).ready(function(){
       },
       success: function(data){
         alert("Bienvenido "+ data.user);
+        renderer.send('succeedLogin', data.user);
         seeChats(data);
       },
       error: function(){
