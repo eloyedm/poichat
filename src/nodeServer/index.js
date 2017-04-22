@@ -63,18 +63,18 @@ io.on('connection', function(socket){
   var chats = []
   socket.on('chat message', function(msg){
     try {
-      console.log(msg)
        data = JSON.parse(msg);
        if(data.name != ""){
-         console.log(data)
          if(users[data.name]){
            socket.broadcast.to(users[data.name]).emit('chat message', {
              origin: "other",
-             message: data.message
+             message: data.message,
+             sender: users[socket.name]
            })
            socket.broadcast.to(users[socket.name]).emit('chat message', {
              origin: "own",
-             message: data.message
+             message: data.message,
+             sender: users[socket.name]
            })
          }
          else{
@@ -96,6 +96,7 @@ io.on('connection', function(socket){
 
   socket.on('login', function(msg){
     var data = validateMessage(msg)
+    console.log(msg)
     if(data){
       if(users[data.name]){
         socket.emit('login', {success: false})
@@ -104,6 +105,7 @@ io.on('connection', function(socket){
         socket.name = data.name;
         socket.emit('login', {success: true,})
       }
+      console.log(users)
     }
   })
 
@@ -128,7 +130,8 @@ io.on('connection', function(socket){
       if(conn != null){
         chats.push(data.name)
         socket.broadcast.to(users[data.name]).emit('answer', {
-          answer: data.answer
+          answer: data.answer,
+          sender: users[socket.name]
         })
       }
     }
@@ -141,7 +144,8 @@ io.on('connection', function(socket){
       if(conn != null){
         socket.broadcast.to(users[msg.name]).emit(
           'candidate', {
-          candidate: msg.candidate
+          candidate: msg.candidate,
+          sender: users[socket.name]
         });
       }
       else{
@@ -158,9 +162,7 @@ io.on('connection', function(socket){
     var data = validateMessage(msg)
     if(data){
       if(users[data.name]){
-        console.log("aqui deberia entrar", users[data.name]);
-        console.log(users);
-        socket.broadcast.to(users[data.name]).emit('buzz', {buzz: "pzzzzz"})
+        socket.broadcast.to(users[data.name]).emit('buzz', {buzz: "pzzzzz", sender: users[socket.name]})
       } else {
         console.log(users[socket.name])
         socket.broadcast.to(users[socket.name]).emit('notHere', {

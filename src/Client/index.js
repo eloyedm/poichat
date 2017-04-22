@@ -9,7 +9,7 @@ console.log(io);
 
 
 let win;
-var chats = [];
+var chats = new Object();
 var watchWindow = '';
 var currentUser = '';
 var userLine = '';
@@ -17,7 +17,7 @@ var returnLine = '';
 var socket = '';
 
 var chatUser = '';
-var friends = [];
+var friends = new Array();
 
 function createWindow() {
   win = new BrowserWindow({width: 800, height: 600});
@@ -61,45 +61,48 @@ ipcMain.on('watch', (event, arg) =>{
 ipcMain.on('new-chat', (event, arg) => {
   currentUser = arg.user
   if(friends.indexOf(arg.friend) == -1){
-    friends.push[arg.friend]
+    friends.push(arg.friend)
     var newChat = new BrowserWindow({width: 800, height: 600});
     newChat.loadURL('file://'+__dirname+'/views/index.html');
     newChat.webContents.openDevTools();
-    chats.push[newChat]
+    chats[arg.friend] = newChat;
+    console.log(chats);
   }
 })
 
 ipcMain.on('opened-chat', (event, arg) => {
-  event.sender.send('user-return', friend[friend.length-1])
+  event.sender.send('user-return', friends[friends.length-1])
   userLine = event.sender
+  console.log(userLine)
 })
 
 ipcMain.on('chat message', (event, arg) => {
   // socket.emit('chat message', arg);
-  returnLine.send('chat message', arg);
+  watchWindow.webContents.send('chat message', arg);
 })
 
 ipcMain.on('offer', (event, arg) => {
   // socket.emit('offer', arg);
-  returnLine.send('offer', arg);
+  watchWindow.webContents.send('offer', arg);
 })
 
 ipcMain.on('answer', (event, arg) => {
   // socket.emit('answer', arg);
-  returnLine.send('answer', arg);
+  watchWindow.webContents.send('answer', arg);
 })
 
 ipcMain.on('buzz', (event, arg) => {
   // socket.emit("buzz", arg);
-  returnLine.send('buzz', arg);
+  watchWindow.webContents.send('buzz', arg);
 })
 
 ipcMain.on('candidate', (event, arg) =>{
-  returnLine.send('candidate', arg);
+  watchWindow.webContents.send('candidate', arg);
 })
 
 ipcMain.on('chat message-r', (event, arg) => {
   // socket.emit('chat message', arg);
+  console.log(arg);
   userLine.send('chat message', arg);
 })
 

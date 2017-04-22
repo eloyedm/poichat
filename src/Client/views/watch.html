@@ -16,9 +16,11 @@
     renderer.send('watch', 'ok')
 
     renderer.on('login', (event, arg) =>{
+      console.log(arg)
       socket.emit('login', arg)
     })
     renderer.on('chat message', (event, arg) => {
+      console.log("aqui llega de la ventana: ")
       console.log(arg)
       socket.emit('chat message', arg);
     })
@@ -35,11 +37,17 @@
       socket.emit("answer", arg);
     })
 
+    renderer.on('testPing', (event, arg) => {
+      console.log('llegueee');
+    })
+
     renderer.on('candidate', (event, arg) => {
       socket.emit("candidate", arg);
     })
 
     socket.on('chat message', function(msg){
+      console.log("aqui llega del socket: ")
+      console.log(msg)
       renderer.send('chat message-r', msg)
     })
 

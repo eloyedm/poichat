@@ -28,6 +28,10 @@
       <button type="button" name="button" id="callBtn" >Call</button>
       <button type="button" name="buzz" id="buzz">Zumbido</button>
     </div>
+
+    <div class="CheckDiv">
+      Picameeeee
+    </div>
     <script>
     var $ = global.jQuery = require('./../node_modules/jquery/dist/jquery.js');
     const renderer = require('electron').ipcRenderer
@@ -38,6 +42,7 @@
     renderer.send('opened-chat', 'ok');
     renderer.on('user-return', (event, arg) => {
       console.log(arg)
+      friend = arg
     })
     //
     var socket = io('http://localhost:8001');
@@ -152,7 +157,7 @@
 
     renderer.on('chat message', (event, arg) => {
     // socket.on('chat message', function(msg){
-
+      console.log(arg);
       var pMsg =  emoticons.replace(arg.message);
       var newMessage = $("<li>", {
         class: arg.origin,
@@ -192,10 +197,11 @@
     // })
 
 
-    $('form').submit(() => {
+    $('form').submit((event) => {
       // ipcRenderer.send('response-message', $('#m').val());
+      event.preventDefault();
       var msg = {
-        name: destination,
+        name: friend,
         message: $('#m').val()
       }
       renderer.send('chat message', JSON.stringify(msg))
@@ -229,8 +235,13 @@
       var friend = {
         name: $("#callUser").val()
       };
-      renderer.send("buzz", JSON.stringify(friend))
+      renderer.send("buzz", JSON.stringify(friend));
       // socket.emit("buzz", JSON.stringify(friend));
+    })
+
+    $(".CheckDiv").click(function(){
+      console.log("aqui vaa");
+      renderer.send('testPing', 'ok');
     })
 
     function handleLogin(success){
