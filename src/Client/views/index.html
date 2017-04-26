@@ -16,6 +16,7 @@
       <form  action="" >
         <input id="m" autocomplete="off"/><button>Send</button>
       </form>
+      <input type="file" id="archivo" name="archivo" value="">
     </div>
     <video autoplay id="local"></video>
 
@@ -156,8 +157,6 @@
     // })
 
     renderer.on('chat message', (event, arg) => {
-    // socket.on('chat message', function(msg){
-      console.log(arg);
       var pMsg =  emoticons.replace(arg.message);
       var newMessage = $("<li>", {
         class: arg.origin,
@@ -167,15 +166,10 @@
     })
 
     renderer.on('buzz', (event, arg) => {
-    // socket.on("buzz", function(){
       console.log("si llega")
       $("#buzzSound").trigger('play')
     })
 
-    // renderer.on('chat message', (event, arg) => {
-    // // socket.on('login', function(data){
-    //   handleLogin(data.success);
-    // })
 
     renderer.on('offer', (event, arg) => {
     // socket.on('offer', function(data){
@@ -205,6 +199,15 @@
         message: $('#m').val()
       }
       renderer.send('chat message', JSON.stringify(msg))
+
+      var fileSended = $("#archivo")[0].files[0];
+      if(file != null){
+        var fileMsg = {
+          name: friend,
+          file: fileSended
+        }
+        renderer.send('file transfer', JSON.stringify(fileMsg))
+      }
       // socket.emit('chat message', JSON.stringify(msg));
       $('#m').val('');
       return false;
@@ -214,10 +217,10 @@
       // var friend = $("#callUser").val();
       if(friend.length > 0 ){
         connectedUser= friend;
+        handleLogin();
         yourConn.createOffer(
           function(offer){
             var newfriend = {name: friend, offer: offer};
-            console.log(newfriend);
             renderer.send('offer', JSON.stringify(newfriend))
             // socket.emit('offer', JSON.stringify(newfriend));
             yourConn.setLocalDescription(offer);
@@ -272,7 +275,7 @@
           yourConn.onicecandidate = function(event){
             if(event.candidate){
               renderer.send('candidate', {
-                name: $("#callUser").val(),
+                name: friend,
                 candidate: event.candidate}
               )
               // socket.emit('candidate', {
@@ -297,7 +300,7 @@
       yourConn.setRemoteDescription(new RTCSessionDescription(offer));
       yourConn.createAnswer(function(answer){
       yourConn.setLocalDescription(answer)
-          var newAnswer = {'name': name, 'answer': answer};
+          var newAnswer = {'name': friend, 'answer': answer};
           renderer.send('answer', JSON.stringify(newAnswer))
           // socket.emit('answer', JSON.stringify(newAnswer));
       }, function(error){

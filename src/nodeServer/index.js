@@ -1,7 +1,10 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
+var dl = require('delivery');
+var fs = require('fs');
+
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
@@ -23,6 +26,7 @@ var dbConnection = mysql.createConnection({
 // })
 
 var users = {};
+var deliverers = [];
 
 http.listen(8001, function(){
   console.log('listening on *:8001');
@@ -61,6 +65,7 @@ app.post('/login', function(req, res){
 
 io.on('connection', function(socket){
   var chats = []
+  var delivery = dl.listen(socket)
   socket.on('chat message', function(msg){
     try {
        data = JSON.parse(msg);
@@ -102,6 +107,7 @@ io.on('connection', function(socket){
       } else {
         users[data.name] = socket.id;
         socket.name = data.name;
+        socket.deliverer = delivery;
         socket.emit('login', {success: true,})
       }
     }
@@ -115,7 +121,8 @@ io.on('connection', function(socket){
         chats.push(data.name)
         socket.broadcast.to(users[data.name]).emit('offer', {
           offer: data.offer,
-          name: socket.name
+          name: socket.name,
+          sender: socket.name
         })
       }
     }
@@ -160,7 +167,11 @@ io.on('connection', function(socket){
     var data = validateMessage(msg)
     if(data){
       if(users[data.name]){
-        socket.broadcast.to(users[data.name]).emit('buzz', {buzz: "pzzzzz", sender: users[socket.name]})
+        socket.broadcast.to(users[data.name]).emit(
+          'buzz', {
+            buzz: "pzzzzz",
+            sender: users[socket.name]
+          });
       } else {
         console.log(users[socket.name])
         socket.broadcast.to(users[socket.name]).emit('notHere', {
@@ -174,6 +185,20 @@ io.on('connection', function(socket){
     var d = socket.name;
     delete users[d];
   })
+
+  delivery.on('receive.success', function(file, extra){
+    var params = file.params;
+    fs.writeFile("images/"+file.name, file.buffer, function(err){
+      if(err){
+        console.log('File could not be saved');
+      }else{
+        users[extra.name].deliverer.send({
+          name: file.name,
+          path: "images/"+file.name
+        })
+      }
+    });
+  });
 })
 
 function validateMessage(msg){

@@ -44,13 +44,11 @@
     })
 
     socket.on('chat message', function(msg){
-      console.log("aqui llega del socket: ")
-      console.log(msg)
       renderer.send('chat message-r', msg)
     })
 
-    socket.on("buzz", function(){
-      renderer.send('buzz-r', 'ok')
+    socket.on("buzz-r", function(data){
+      renderer.send('buzz-r', data)
     })
 
     socket.on('offer', function(data){

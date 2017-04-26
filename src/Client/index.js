@@ -98,34 +98,31 @@ ipcMain.on('candidate', (event, arg) =>{
   watchWindow.webContents.send('candidate', arg);
 })
 
+ipcMain.on('file transfer', (event, arg) => {
+  console.log(arg);
+})
+
 ipcMain.on('chat message-r', (event, arg) => {
-  // socket.emit('chat message', arg);
-  console.log("aqui viene el mensaje");
-  console.log(arg.name);
-  console.log("ventanas de chat");
-  console.log(chats);
-  console.log("ventana de sockets");
-  console.log(watchWindow);
   chats[arg.sender].webContents.send('chat message', arg);
 })
 
 ipcMain.on('offer-r', (event, arg) => {
   // socket.emit('offer', arg);
-  userLine.send('offer', arg);
+  chats[arg.sender].webContents.send('offer', arg);
 })
 
 ipcMain.on('answer-r', (event, arg) => {
   // socket.emit('answer', arg);
-  userLine.send('answer', arg);
+  chats[arg.sender].webContents.send('answer', arg);
 })
 
 ipcMain.on('buzz-r', (event, arg) => {
   // socket.emit("buzz", arg);
-  userLine.send('buzz', arg);
+  chats[arg.sender].webContents.send('buzz', arg);
 })
 
 ipcMain.on('candidate-r', (event, arg) =>{
-  userLine.send('buzz', arg);
+  chats[arg.sender].webContents.send('candidate', arg);
 })
 
 // var conn = new WebSocket('ws://localhost:8080');

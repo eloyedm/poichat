@@ -4,6 +4,7 @@
   "description": "my first socket.io app",
   "dependencies": {
     "body-parser": "^1.17.1",
+    "delivery": "0.0.6",
     "express": "^4.14.0",
     "mysql": "github:mysqljs/mysql",
     "socket.io": "^1.7.2",
