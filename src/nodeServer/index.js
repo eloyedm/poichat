@@ -69,12 +69,12 @@ io.on('connection', function(socket){
            socket.broadcast.to(users[data.name]).emit('chat message', {
              origin: "other",
              message: data.message,
-             sender: users[socket.name]
+             sender: socket.name
            })
            socket.broadcast.to(users[socket.name]).emit('chat message', {
              origin: "own",
              message: data.message,
-             sender: users[socket.name]
+             sender: socket.name
            })
          }
          else{
@@ -96,7 +96,6 @@ io.on('connection', function(socket){
 
   socket.on('login', function(msg){
     var data = validateMessage(msg)
-    console.log(msg)
     if(data){
       if(users[data.name]){
         socket.emit('login', {success: false})
@@ -105,7 +104,6 @@ io.on('connection', function(socket){
         socket.name = data.name;
         socket.emit('login', {success: true,})
       }
-      console.log(users)
     }
   })
 
@@ -170,6 +168,11 @@ io.on('connection', function(socket){
         })
       }
     }
+  })
+
+  socket.on('disconnect', function() {
+    var d = socket.name;
+    delete users[d];
   })
 })
 

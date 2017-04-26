@@ -45,7 +45,6 @@ app.on('activate', () => {
 })
 
 ipcMain.on('succeedLogin', (event, arg) =>{
-  console.log(socket)
   userName = {name: arg}
   chatUser = arg
   watchWindow = new BrowserWindow({parent: win,width: 400, height: 200});
@@ -66,18 +65,17 @@ ipcMain.on('new-chat', (event, arg) => {
     newChat.loadURL('file://'+__dirname+'/views/index.html');
     newChat.webContents.openDevTools();
     chats[arg.friend] = newChat;
-    console.log(chats);
   }
 })
 
 ipcMain.on('opened-chat', (event, arg) => {
   event.sender.send('user-return', friends[friends.length-1])
   userLine = event.sender
-  console.log(userLine)
 })
 
 ipcMain.on('chat message', (event, arg) => {
   // socket.emit('chat message', arg);
+  console.log("ahi va el mensaje");
   watchWindow.webContents.send('chat message', arg);
 })
 
@@ -102,8 +100,13 @@ ipcMain.on('candidate', (event, arg) =>{
 
 ipcMain.on('chat message-r', (event, arg) => {
   // socket.emit('chat message', arg);
-  console.log(arg);
-  userLine.send('chat message', arg);
+  console.log("aqui viene el mensaje");
+  console.log(arg.name);
+  console.log("ventanas de chat");
+  console.log(chats);
+  console.log("ventana de sockets");
+  console.log(watchWindow);
+  chats[arg.sender].webContents.send('chat message', arg);
 })
 
 ipcMain.on('offer-r', (event, arg) => {
