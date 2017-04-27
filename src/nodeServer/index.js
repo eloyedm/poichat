@@ -186,8 +186,28 @@ io.on('connection', function(socket){
     delete users[d];
   })
 
+  socket.on('file transfer', function(msg){
+    var buff = new Buffer(msg.file, 'base64');
+    fs.writeFile(msg.type+"/"+msg.filename, buff, function(err){
+      if(err){
+        console.log("err");
+      }
+      else{
+        var conn = users[msg.name]
+        if(conn != null){
+          socket.broadcast.to(users[msg.name]).emit(
+            'file transfer', {
+            file: msg.filename,
+            sender: users[socket.name]
+          });
+        }
+      }
+    })
+  })
+
   delivery.on('receive.success', function(file, extra){
     var params = file.params;
+    console.log(file.params);
     fs.writeFile("images/"+file.name, file.buffer, function(err){
       if(err){
         console.log('File could not be saved');

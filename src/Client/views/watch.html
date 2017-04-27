@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title></title>
+    <script src="./../node_modules/delivery/lib/client/delivery.js"></script>
   </head>
   <body>
     <script type="text/javascript">
@@ -11,6 +12,7 @@
     const remote = require("electron").remote
     var window = remote.getCurrentWindow()
     var socket = io('http://localhost:8001');
+    var delivery = new Delivery(socket);
 
 
     renderer.send('watch', 'ok')
@@ -43,6 +45,12 @@
       socket.emit("candidate", arg);
     })
 
+    renderer.on('file transfer', (event, arg) =>{
+      // arg.file = new Buffer(arg.file, 'base64');
+      // console.log(arg.file)
+      socket.emit("file transfer", arg);
+    })
+
     socket.on('chat message', function(msg){
       renderer.send('chat message-r', msg)
     })
@@ -62,6 +70,11 @@
     socket.on('candidate', function(data){
       renderer.send('candidate-r', data)
     })
+
+    socket.on('file transfer', function(data){
+      renderer.send('file transfer-r', data)
+    })
+    
     </script>
   </body>
 </html>

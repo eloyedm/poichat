@@ -201,12 +201,35 @@
       renderer.send('chat message', JSON.stringify(msg))
 
       var fileSended = $("#archivo")[0].files[0];
-      if(file != null){
-        var fileMsg = {
-          name: friend,
-          file: fileSended
-        }
-        renderer.send('file transfer', JSON.stringify(fileMsg))
+      var fileName = fileSended.name;
+      var fileType = fileSended.type;
+      var fileFormat = fileSended.path;
+      fileFormat = fileFormat.split("/");
+      fileFormat = fileFormat[fileFormat.length-1];
+      fileFormat = fileFormat.split(".");
+      fileFormat = fileFormat[fileFormat.length-1];
+      fileType = fileType.split("/")[0];
+      console.log(fileSended)
+      if(fileSended != null){
+        var blobToBase64 = function(blob, cb) {
+            var reader = new FileReader();
+            reader.onload = function() {
+              var dataUrl = reader.result;
+              var base64 = dataUrl.split(',')[1];
+              cb(base64);
+            };
+            reader.readAsDataURL(blob);
+          };
+        blobToBase64(fileSended, function(base64){
+          var fileMsg = {
+            name: friend,
+            file: base64,
+            filename: fileName,
+            type: fileType,
+            format: fileFormat
+          }
+          renderer.send('file transfer', fileMsg)
+        })
       }
       // socket.emit('chat message', JSON.stringify(msg));
       $('#m').val('');

@@ -99,7 +99,7 @@ ipcMain.on('candidate', (event, arg) =>{
 })
 
 ipcMain.on('file transfer', (event, arg) => {
-  console.log(arg);
+  watchWindow.webContents.send('file transfer', arg);
 })
 
 ipcMain.on('chat message-r', (event, arg) => {
@@ -123,6 +123,11 @@ ipcMain.on('buzz-r', (event, arg) => {
 
 ipcMain.on('candidate-r', (event, arg) =>{
   chats[arg.sender].webContents.send('candidate', arg);
+})
+
+ipcMain.on('file transfer-r', (event, arg) => {
+  arg.name = chatUser;
+  chats[arg.sender].webContents.send('file transfer', arg);
 })
 
 // var conn = new WebSocket('ws://localhost:8080');
