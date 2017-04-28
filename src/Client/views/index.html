@@ -201,16 +201,15 @@
       renderer.send('chat message', JSON.stringify(msg))
 
       var fileSended = $("#archivo")[0].files[0];
-      var fileName = fileSended.name;
-      var fileType = fileSended.type;
-      var fileFormat = fileSended.path;
-      fileFormat = fileFormat.split("/");
-      fileFormat = fileFormat[fileFormat.length-1];
-      fileFormat = fileFormat.split(".");
-      fileFormat = fileFormat[fileFormat.length-1];
-      fileType = fileType.split("/")[0];
-      console.log(fileSended)
       if(fileSended != null){
+        var fileName = fileSended.name;
+        var fileType = fileSended.type;
+        var fileFormat = fileSended.path;
+        fileFormat = fileFormat.split("/");
+        fileFormat = fileFormat[fileFormat.length-1];
+        fileFormat = fileFormat.split(".");
+        fileFormat = fileFormat[fileFormat.length-1];
+        fileType = fileType.split("/")[0];
         var blobToBase64 = function(blob, cb) {
             var reader = new FileReader();
             reader.onload = function() {
