@@ -4,6 +4,7 @@ var io = require('socket.io')(http);
 var bodyParser = require('body-parser');
 var dl = require('delivery');
 var fs = require('fs');
+var md5 = require('./node_modules/blueimp-md5/js/md5.min.js')
 
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -13,7 +14,7 @@ var mysql = require('mysql');
 var dbConnection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : 'diaz.1913',
+  password : 'homecoming96',
   database : 'senses'
 });
 
@@ -51,11 +52,17 @@ app.post("/register", function(req, res){
   })
 })
 
+app.get('/receive/file', function(req, res){
+  console.log("ya llego a descargar")
+})
+
 app.post('/login', function(req, res){
   //authentication with te db
   if(check(req.body.nameUser, req.body.pass)){
     dbConnection.query('SELECT name FROM users WHERE name != ? AND online = 1', [req.body.nameUser], function(error, results, fields){
-      res.json({user: req.body.nameUser, people: results});
+      var newToken = randomize();
+      dbConnection.query('UPDATE users SET validToken = ? WHERE name = ?', [newToken, req.body.nameUser]);
+      res.json({user: req.body.nameUser, people: results, token: newToken});
     });
   }
   else{
@@ -100,8 +107,13 @@ io.on('connection', function(socket){
   });
 
   socket.on('login', function(msg){
+    console.log(msg)
     var data = validateMessage(msg)
+    console.log(data)
     if(data){
+      validateToken(data.name, data.token, function(result){
+        console.log(result);
+      })
       if(users[data.name]){
         socket.emit('login', {success: false})
       } else {
@@ -187,8 +199,9 @@ io.on('connection', function(socket){
   })
 
   socket.on('file transfer', function(msg){
+    var newFilename = msg.filename.toLowerCase().replace(" ", "-")
     var buff = new Buffer(msg.file, 'base64');
-    fs.writeFile(msg.type+"/"+msg.filename, buff, function(err){
+    fs.writeFile(msg.type+"/"+newFilename, buff, function(err){
       if(err){
         console.log("err");
       }
@@ -197,8 +210,8 @@ io.on('connection', function(socket){
         if(conn != null){
           socket.broadcast.to(users[msg.name]).emit(
             'file transfer', {
-            file: msg.filename,
-            sender: users[socket.name]
+            file: newFilename,
+            sender: socket.name
           });
         }
       }
@@ -279,6 +292,24 @@ function getAvailableUsers(name){
     }
   })
   return users
+}
+
+function randomize() {
+    var startString =  Math.random().toString(36).substr(2); // remove `0.`
+    return md5(startString);
+};
+
+function validateToken(name, token, callback){
+  dbConnection.query('SELECT name FROM users WHERE name = ? AND validToken = ?', [name, token], function(error, results, fields){
+    if(!error){
+      if(results.length > 0){
+        callback(results[0]);
+      }
+      else{
+        callback(null);
+      }
+    }
+  });
 }
 // webRTC.rtc.on('chat_msg', (data, socket) => {
 //   var roomList = webRTC.rtc.rooms[data.room] || [];

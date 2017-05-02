@@ -15,6 +15,7 @@ var currentUser = '';
 var userLine = '';
 var returnLine = '';
 var socket = '';
+var token = '';
 
 var chatUser = '';
 var friends = new Array();
@@ -45,8 +46,10 @@ app.on('activate', () => {
 })
 
 ipcMain.on('succeedLogin', (event, arg) =>{
-  userName = {name: arg}
-  chatUser = arg
+  userName = {name: arg.name, token: arg.token}
+  chatUser = arg.name
+  token = arg.token
+  console.log(token)
   watchWindow = new BrowserWindow({parent: win,width: 400, height: 200});
   watchWindow.loadURL('file://' + __dirname + '/views/watch.html');
   watchWindow.webContents.openDevTools();
@@ -127,6 +130,7 @@ ipcMain.on('candidate-r', (event, arg) =>{
 
 ipcMain.on('file transfer-r', (event, arg) => {
   arg.name = chatUser;
+  arg.token = token;
   chats[arg.sender].webContents.send('file transfer', arg);
 })
 

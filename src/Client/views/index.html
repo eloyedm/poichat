@@ -185,6 +185,10 @@
     // socket.on('candidate', function(data){
       handleCandidate(arg.candidate)
     })
+
+    renderer.on('file transfer', (event, arg) => {
+      handleFile(arg.file, arg.token)
+    })
     //
     // socket.on('notHere', function(data){
     //   alert(data.error)
@@ -336,6 +340,26 @@
 
     function handleCandidate(candidate){
       yourConn.addIceCandidate(new RTCIceCandidate(candidate));
+    }
+
+    function handleFile(file, token){
+      var fileReceived = $("<li />", {
+        class: "receivedFile",
+      });
+
+      var linkToFile = $("<a />", {
+        class: "linkToFile",
+        href: "http://localhost:8000/receive/file?file="+file+"&token="+token
+      });
+
+      var titleFile = $("<span />", {
+        class:"titleFile",
+        text: file
+      });
+
+      linkToFile.append(titleFile);
+      fileReceived.append(linkToFile);
+      $("#messages").append(fileReceived);
     }
 
     function makeid()

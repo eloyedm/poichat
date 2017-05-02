@@ -55,7 +55,7 @@ $(document).ready(function(){
       },
       success: function(data){
         alert("Bienvenido "+ data.user);
-        renderer.send('succeedLogin', data.user);
+        renderer.send('succeedLogin',{name:data.user, token:data.token});
         seeChats(data);
       },
       error: function(){
