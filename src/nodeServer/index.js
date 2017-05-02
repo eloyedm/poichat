@@ -14,7 +14,7 @@ var mysql = require('mysql');
 var dbConnection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : 'homecoming96',
+  password : 'diaz.1913',
   database : 'senses'
 });
 
@@ -52,8 +52,12 @@ app.post("/register", function(req, res){
   })
 })
 
-app.get('/receive/file', function(req, res){
-  console.log("ya llego a descargar")
+app.get('/receive/:type/:file/:token', function(req, res){
+  var token = req.params.token
+  var file = req.params.file
+  var type = req.params.type
+  console.log( token + " " + file + " " + type)
+  res.download(__dirname+'/'+type+'/'+file, file);
 })
 
 app.post('/login', function(req, res){
@@ -107,21 +111,18 @@ io.on('connection', function(socket){
   });
 
   socket.on('login', function(msg){
-    console.log(msg)
     var data = validateMessage(msg)
-    console.log(data)
     if(data){
       validateToken(data.name, data.token, function(result){
-        console.log(result);
+        if(users[result.name]){
+          socket.emit('login', {success: false})
+        } else {
+          users[result.name] = socket.id;
+          socket.name = result.name;
+          socket.deliverer = delivery;
+          socket.emit('login', {success: true,})
+        }
       })
-      if(users[data.name]){
-        socket.emit('login', {success: false})
-      } else {
-        users[data.name] = socket.id;
-        socket.name = data.name;
-        socket.deliverer = delivery;
-        socket.emit('login', {success: true,})
-      }
     }
   })
 
@@ -211,7 +212,8 @@ io.on('connection', function(socket){
           socket.broadcast.to(users[msg.name]).emit(
             'file transfer', {
             file: newFilename,
-            sender: socket.name
+            sender: socket.name,
+            type: msg.type
           });
         }
       }

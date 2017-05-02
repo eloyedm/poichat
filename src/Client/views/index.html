@@ -187,7 +187,7 @@
     })
 
     renderer.on('file transfer', (event, arg) => {
-      handleFile(arg.file, arg.token)
+      handleFile(arg.file, arg.token, arg.type)
     })
     //
     // socket.on('notHere', function(data){
@@ -342,14 +342,14 @@
       yourConn.addIceCandidate(new RTCIceCandidate(candidate));
     }
 
-    function handleFile(file, token){
+    function handleFile(file, token, type){
       var fileReceived = $("<li />", {
         class: "receivedFile",
       });
 
       var linkToFile = $("<a />", {
         class: "linkToFile",
-        href: "http://localhost:8000/receive/file?file="+file+"&token="+token
+        href: "http://localhost:8001/receive/"+type+"/"+file+"/"+token
       });
 
       var titleFile = $("<span />", {
