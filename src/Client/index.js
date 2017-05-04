@@ -3,7 +3,6 @@ const {ipcMain} = require('electron')
 const path = require('path');
 const url = require('url');
 var io = require('./node_modules/socket.io-client/dist/socket.io.js');
-console.log(io);
 // const Backbone = require('backbone')
 // var WebSocket = require('ws');
 
@@ -21,7 +20,7 @@ var chatUser = '';
 var friends = new Array();
 
 function createWindow() {
-  win = new BrowserWindow({width: 800, height: 600});
+  win = new BrowserWindow({width: 400, height: 300});
   win.loadURL('file://' + __dirname + '/views/login.html');
 
   win.webContents.openDevTools();
@@ -49,8 +48,7 @@ ipcMain.on('succeedLogin', (event, arg) =>{
   userName = {name: arg.name, token: arg.token}
   chatUser = arg.name
   token = arg.token
-  console.log(token)
-  watchWindow = new BrowserWindow({parent: win,width: 400, height: 200});
+  watchWindow = new BrowserWindow({parent: win,width: 300, height: 200});
   watchWindow.loadURL('file://' + __dirname + '/views/watch.html');
   watchWindow.webContents.openDevTools();
 })
@@ -125,6 +123,11 @@ ipcMain.on('buzz-r', (event, arg) => {
 })
 
 ipcMain.on('candidate-r', (event, arg) =>{
+  console.log(arg)
+  arg = JSON.parse(arg);
+  console.log(arg);
+  var currentChat = chats[arg.sender];
+  arg = JSON.stringify(arg);
   chats[arg.sender].webContents.send('candidate', arg);
 })
 

@@ -62,16 +62,18 @@ app.get('/receive/:type/:file/:token', function(req, res){
 
 app.post('/login', function(req, res){
   //authentication with te db
-  if(check(req.body.nameUser, req.body.pass)){
-    dbConnection.query('SELECT name FROM users WHERE name != ? AND online = 1', [req.body.nameUser], function(error, results, fields){
-      var newToken = randomize();
-      dbConnection.query('UPDATE users SET validToken = ? WHERE name = ?', [newToken, req.body.nameUser]);
-      res.json({user: req.body.nameUser, people: results, token: newToken});
-    });
-  }
-  else{
-    res.status(401).end();
-  }
+  check(req.body.nameUser, req.body.pass, function(valid){
+    if(valid){
+      dbConnection.query('SELECT name FROM users WHERE name != ? AND online = 1', [req.body.nameUser], function(error, results, fields){
+        var newToken = randomize();
+        dbConnection.query('UPDATE users SET validToken = ? WHERE name = ?', [newToken, req.body.nameUser]);
+        res.json({user: req.body.nameUser, people: results, token: newToken});
+      });
+    }
+    else{
+      res.status(401).end();
+    }
+  });
 })
 
 io.on('connection', function(socket){
@@ -160,10 +162,11 @@ io.on('connection', function(socket){
     // if(data){
       var conn = users[msg.name]
       if(conn != null){
+        console.log(msg.sender)
         socket.broadcast.to(users[msg.name]).emit(
           'candidate', {
           candidate: msg.candidate,
-          sender: users[socket.name]
+          sender: msg.sender
         });
       }
       else{
@@ -259,16 +262,17 @@ function registerUser(name, password, email){
   })
 }
 
-function check(name, password){
+function check(name, password, callback){
   var parameters = [name, password]
   return dbConnection.query('SELECT name FROM users WHERE name = ? AND password = ?', parameters, function(error, results, fields){
     if(results.length == 0)
     {
-      throw error
+      callback(false)
     }
     else{
+      console.log("si entro")
       setOnline(name);
-      return true
+      callback(true)
     }
   })
 }

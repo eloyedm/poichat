@@ -67,6 +67,7 @@
     })
 
     socket.on('candidate', function(data){
+      console.log(data)
       renderer.send('candidate-r', data)
     })
 

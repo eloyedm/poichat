@@ -4,6 +4,7 @@ var io = require('./../node_modules/socket.io-client/dist/socket.io.js')
 const remote = require("electron").remote
 var window = remote.getCurrentWindow()
 var md5 = require('./../node_modules/blueimp-md5/js/md5.min.js')
+var serverAddress = "http://localhost:8001"
 
 function chatWindow(){
   this.userName = '';
@@ -48,7 +49,7 @@ $(document).ready(function(){
     var codedPass = md5($("#password").val());
     $.ajax({
       method: "POST",
-      url: "http://localhost:8001/login",
+      url: serverAddress+"/login",
       data: {
         nameUser: $("#userName").val(),
         pass: codedPass
@@ -71,7 +72,7 @@ $(document).ready(function(){
     var email = $("#email").val();
     $.ajax({
       method: "POST",
-      url: "http://localhost:8001/register",
+      url: serverAddress+"/register",
       data: {
         userName: userName,
         password: codedPass,
