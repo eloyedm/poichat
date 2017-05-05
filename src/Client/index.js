@@ -62,7 +62,7 @@ ipcMain.on('new-chat', (event, arg) => {
   currentUser = arg.user
   if(friends.indexOf(arg.friend) == -1){
     friends.push(arg.friend)
-    var newChat = new BrowserWindow({width: 800, height: 600});
+    var newChat = new BrowserWindow({width: 400, height: 300});
     newChat.loadURL('file://'+__dirname+'/views/index.html');
     newChat.webContents.openDevTools();
     chats[arg.friend] = newChat;
@@ -104,6 +104,7 @@ ipcMain.on('file transfer', (event, arg) => {
 })
 
 ipcMain.on('chat message-r', (event, arg) => {
+  console.log(chats[arg.sender]);
   chats[arg.sender].webContents.send('chat message', arg);
 })
 
@@ -123,12 +124,14 @@ ipcMain.on('buzz-r', (event, arg) => {
 })
 
 ipcMain.on('candidate-r', (event, arg) =>{
-  console.log(arg)
-  arg = JSON.parse(arg);
-  console.log(arg);
-  var currentChat = chats[arg.sender];
-  arg = JSON.stringify(arg);
-  chats[arg.sender].webContents.send('candidate', arg);
+  console.log("candidate enviado por este wey" + arg.sender );
+  console.log("chats: ");
+  console.log(chats[arg.sender]);
+
+  // console.log(arg);
+  // var currentChat = chats[arg.sender];
+  // console.log(currentChat);
+  // chats[currentChat].webContents.send('candidate', arg);
 })
 
 ipcMain.on('file transfer-r', (event, arg) => {
