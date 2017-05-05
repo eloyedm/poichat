@@ -1,0 +1,77 @@
+delimiter $$
+
+/*TABLA USUARIOS (Usuarios individuales) ---------------------------------------------------------------------*/
+
+create or replace procedure sp_login(
+	in _data varchar(50),
+    in _password varchar(50)
+)
+begin
+	select * from user
+    where _data = email or _data = username and _password = password;
+end$$
+
+create or replace procedure sp_setUser(
+	in _username varchar(50),
+    in _email varchar(50),
+    in _password varchar(50),
+    in _info varchar(255),
+    in _status enum('conectado','ausente','ocupado','desconectado'),
+    in _picture text,
+    in _fk_idGame int unsigned,
+    in _points int unsigned,
+    in _record int unsigned
+)
+begin
+	if not exists(select * from user where _email = email) then
+		insert into user set
+			username 	= _username,
+            email 		= _email,
+            password 	= _password,
+            info 		= _info,
+            status 		= _status,
+            picture 	= _picture,
+            fk_idGame 	= _fk_idGame,
+            points 		= _points,
+            record 		= _record;
+    else
+		update user set
+            info 		= _info,
+            status 		= _status,
+            picture 	= _picture,
+            fk_idGame 	= _fk_idGame,
+            points 		= _points,
+            record 		= _record
+		where username = _username or email = _email and password = _password;
+	end if;
+end$$
+
+create or replace procedure sp_getUser(
+	in _idUser int unsigned
+)
+begin
+	select * from user
+    where _idUser = idUser;
+end$$
+
+/*TABLA TEAM -------------------------------------------------------------------------------------------------*/
+
+create or replace sp_setTeam(
+	in _name varchar(255)
+)
+begin
+	insert into team set
+		name = _name;
+end$$
+
+create or replace sp_getTeam(
+	in _idTeam int unsigned
+)
+begin
+	select * from team where idTeam = _idTeam;
+end$$
+
+delimiter ;
+
+call sp_setUser('gerardosoriano97','gerardosoriano97@gmail.com',md5('jgsoriano97'),'Por favor habran la puerta, dejenme salir.',1,null,null,null,null);
+call sp_login('gerardosoriano97',md5('jgsoriano97'));
