@@ -124,14 +124,14 @@ ipcMain.on('buzz-r', (event, arg) => {
 })
 
 ipcMain.on('candidate-r', (event, arg) =>{
-  console.log("candidate enviado por este wey" + arg.sender );
-  console.log("chats: ");
+  console.log("candidate enviado por este wey"  );
+  console.log(arg);
   console.log(chats[arg.sender]);
 
   // console.log(arg);
   // var currentChat = chats[arg.sender];
   // console.log(currentChat);
-  // chats[currentChat].webContents.send('candidate', arg);
+  chats[arg.sender].webContents.send('candidate', arg);
 })
 
 ipcMain.on('file transfer-r', (event, arg) => {
