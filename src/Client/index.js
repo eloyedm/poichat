@@ -9,6 +9,7 @@ var io = require('./node_modules/socket.io-client/dist/socket.io.js');
 
 let win;
 var chats = new Object();
+var games = new Object();
 var watchWindow = '';
 var currentUser = '';
 var userLine = '';
@@ -106,6 +107,15 @@ ipcMain.on('statusChange', (event, arg) => {
   arg.token = token;
   arg.name = chatUser;
   watchWindow.webContents.send('statusChange', arg);
+})
+
+ipcMain.on('startGame', (event, arg) => {
+  if(friends.indexOf(arg.friend) == -1){
+    var newGame = new BrowserWindow({width: 800, height: 600});
+    newGame.loadURL('file://'+__dirname+'/views/game.html');
+    newGame.webContents.openDevTools();
+    games[arg.friend] = newGame;
+  }
 })
 
 ipcMain.on('chat message-r', (event, arg) => {

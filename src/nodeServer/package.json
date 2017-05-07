@@ -9,6 +9,8 @@
     "delivery": "0.0.6",
     "express": "^4.14.0",
     "mysql": "github:mysqljs/mysql",
+    "nodemailer": "^4.0.1",
+    "sendmail": "^1.1.1",
     "socket.io": "^1.7.2",
     "webrtc.io": "0.0.4"
   }

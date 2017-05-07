@@ -5,7 +5,9 @@ var bodyParser = require('body-parser');
 var dl = require('delivery');
 var fs = require('fs');
 var md5 = require('./node_modules/blueimp-md5/js/md5.min.js')
-var CryptoJS = require("crypto-js");
+var nodemailer = require('nodemailer')
+var CryptoJS = require('crypto-js');
+
 
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -18,6 +20,22 @@ var dbConnection = mysql.createConnection({
   password : 'homecoming96',
   database : 'senses'
 });
+
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'senses.chat@gmail.com',
+    pass: 'diaz.1913'
+  }
+});
+
+
+var mailOptions = {
+  from: ' "Senses Chat" <supportsenses@mail.com>',
+  subject: 'Welcome to Senses ',
+  text: "Thanks for joining to senseswe hope you have a good time with us",
+  to: ''
+};
 
 //dbConnection.connect("");
 
@@ -45,7 +63,15 @@ app.post("/register", function(req, res){
 
   dbConnection.query('SELECT * FROM user WHERE username = ?',[userName], function(error, results, fields){
     if(results.length == 0){
-      registerUser(userName, password, email)
+      registerUser(userName, password, email, function(result, email, name){
+        mailOptions.to = email;
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                return console.log(error);
+            }
+            console.log('Message %s sent: %s', info.messageId, info.response);
+        });
+      })
     }
     else{
       res.status(401).end();
@@ -258,15 +284,16 @@ function validateMessage(msg){
   }
 }
 
-function registerUser(name, password, email){
-  var parameters = {username: name, password: password, email: email, secret: randomize(false)}
+function registerUser(name, password, email, callback){
+  var parameters = {username: name, password: password, email: email, secret: randomize(false), confirmed: false}
   return dbConnection.query('INSERT INTO user SET ?', parameters, function(error, results, fields){
     if(error)
     {
       throw error
     }
     else{
-      return true
+      console.log("ya se inserto, sigue el mail")
+    callback(true,email, name);
     }
   })
 }
