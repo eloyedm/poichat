@@ -50,6 +50,10 @@
       socket.emit("file transfer", arg);
     })
 
+    renderer.on('statusChange', (event, arg)=>{
+      socket.emit('statusChange', arg);
+    })
+
     socket.on('chat message', function(msg){
       renderer.send('chat message-r', msg)
     })

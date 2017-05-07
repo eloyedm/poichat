@@ -20,7 +20,7 @@ var chatUser = '';
 var friends = new Array();
 
 function createWindow() {
-  win = new BrowserWindow({width: 400, height: 300});
+  win = new BrowserWindow({width: 800, height: 600});
   win.loadURL('file://' + __dirname + '/views/login.html');
 
   win.webContents.openDevTools();
@@ -62,7 +62,7 @@ ipcMain.on('new-chat', (event, arg) => {
   currentUser = arg.user
   if(friends.indexOf(arg.friend) == -1){
     friends.push(arg.friend)
-    var newChat = new BrowserWindow({width: 400, height: 300});
+    var newChat = new BrowserWindow({width: 800, height: 600});
     newChat.loadURL('file://'+__dirname+'/views/index.html');
     newChat.webContents.openDevTools();
     chats[arg.friend] = newChat;
@@ -100,6 +100,12 @@ ipcMain.on('candidate', (event, arg) =>{
 
 ipcMain.on('file transfer', (event, arg) => {
   watchWindow.webContents.send('file transfer', arg);
+})
+
+ipcMain.on('statusChange', (event, arg) => {
+  arg.token = token;
+  arg.name = chatUser;
+  watchWindow.webContents.send('statusChange', arg);
 })
 
 ipcMain.on('chat message-r', (event, arg) => {

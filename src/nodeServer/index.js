@@ -63,12 +63,12 @@ app.get('/receive/:type/:file/:token', function(req, res){
 
 app.post('/login', function(req, res){
   //authentication with te db
-  check(req.body.nameUser, req.body.pass, function(valid){
+  check(req.body.nameUser, req.body.pass, function(valid, status){
     if(valid){
-      dbConnection.query('SELECT username, status FROM user WHERE username != ? AND status != 0', [req.body.nameUser], function(error, results, fields){
+      dbConnection.query('SELECT username, status FROM user WHERE username != ? AND status != 4', [req.body.nameUser], function(error, results, fields){
         var newToken = randomize();
         dbConnection.query('UPDATE user SET validToken = ? WHERE username = ?', [newToken, req.body.nameUser]);
-        res.json({user: req.body.nameUser, people: results, token: newToken});
+        res.json({user: req.body.nameUser, people: results, token: newToken, status: status});
       });
     }
     else{
@@ -225,6 +225,13 @@ io.on('connection', function(socket){
     })
   })
 
+  socket.on('statusChange', function(msg){
+    validateToken(msg.name, msg.token, function(result){
+      dbConnection.query('UPDATE user SET status = ? WHERE username = ?', [msg.status, msg.name], function(error, results, fields){
+      });
+    })
+  })
+
   delivery.on('receive.success', function(file, extra){
     var params = file.params;
     console.log(file.params);
@@ -266,7 +273,7 @@ function registerUser(name, password, email){
 
 function check(name, password, callback){
   var parameters = [name, password]
-  return dbConnection.query('SELECT username FROM user WHERE username = ? AND password = ?', parameters, function(error, results, fields){
+  return dbConnection.query('SELECT username, status FROM user WHERE username = ? AND password = ?', parameters, function(error, results, fields){
     if(results.length == 0)
     {
       callback(false)
@@ -274,7 +281,7 @@ function check(name, password, callback){
     else{
       console.log("si entro")
       setOnline(name);
-      callback(true)
+      callback(true, results[0].status)
     }
   })
 }
@@ -291,11 +298,12 @@ function setOnline(name){
 }
 
 function getAvailableUsers(name){
-  var users = dbConnection.query('SELECT username FROM user WHERE username != ? AND status != 0', [name], function(error, results, fields){
+  var users = dbConnection.query('SELECT username, status FROM user WHERE username != ? AND status != 0', [name], function(error, results, fields){
     if(error){
       throw error
     }
     else{
+      console.log(results);
       return results
     }
   })
@@ -316,7 +324,7 @@ function randomize(crypt) {
 };
 
 function validateToken(name, token, callback){
-  dbConnection.query('SELECT name FROM users WHERE name = ? AND validToken = ?', [name, token], function(error, results, fields){
+  dbConnection.query('SELECT username FROM user WHERE username = ? AND validToken = ?', [name, token], function(error, results, fields){
     if(!error){
       if(results.length > 0){
         callback(results[0]);

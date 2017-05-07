@@ -19,13 +19,27 @@ function chatWindow(){
       text: data.user
     });
 
+    var userStatus = $("<select />", {
+      class: "statusList"
+    });
+
+    var statusNames = ["En linea", "Ausente", "Ocupado"];
+
+    var statusName = "";
+    for(var i = 1; i< 4; i++){
+      statusName += '<option value="'+i+'">'+statusNames[i-1]+'</option>'
+    }
+
+    userStatus.html(statusName);
+
+    userTitle.append(userStatus);
     var friends = $("<ul />", {
       class: "friendsContainer"
     });
 
     var friend = "";
     for (person of data.people) {
-      friend += "<li class='friendContainer' data="+person.name+">"+person.name+"</li>";
+      friend += "<li class='friendContainer' data="+person.username+">"+person.username+"<span>"+person.status+"  </span></li>";
     }
     friends.html(friend);
     mainContainer.append(friends);
@@ -36,7 +50,11 @@ function chatWindow(){
     $(".friendContainer").click(function(){
       var friendName = this.getAttribute('data');
       renderer.send('new-chat',{user: data.user, friend: friendName} );
-    })
+    });
+
+    $(".statusList").change(function(){
+      renderer.send('statusChange', {status: this.value});
+    });
   }
 }
 
