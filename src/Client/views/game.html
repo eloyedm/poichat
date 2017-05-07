@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Space Invaders</title>
+    <style media="screen">
+      body {
+        width: 100%;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        overflow: hidden; }
+        body > div#Starfield {
+          width: 100%;
+          height: 100%;
+          z-index: -1;
+          position: absolute;
+          left: 0;
+          top: 0; }
+        body > div#GameContainer {
+          width: 800px;
+          margin: 0 auto; }
+    </style>
+  </head>
+  <body>
+    <div id="Starfield"></div>
+    <div id="GameContainer">
+      <canvas id="GameCanvas"></canvas>
+      <canvas id="Opponent"></canvas>
+    </div>
+    <!--Internal-->
+    <script type="text/javascript" src="./../js/starfield.js"></script>
+    <script type="text/javascript" src="./../js/spaceinvaders.js"></script>
+    <script type="text/javascript">
+      var $ = global.jQuery = require('./../node_modules/jquery/dist/jquery.js');
+
+      $(document).ready(function(){
+        var container = $('div#Starfield').get(0);
+        var starfield = new Starfield();
+        starfield.init(container);
+        starfield.start();
+
+        var canvas = $('canvas#GameCanvas').get(0);
+        canvas.width = 800;
+        canvas.height = 600;
+
+        var game = new Game();
+        game.init(canvas);
+        game.start();
+
+        $(window).keydown(function(e){
+          var keycode = e.which;
+          game.keydown(keycode);
+        });
+        $(window).keyup(function(e){
+          var keycode = e.which;
+          game.keyup(keycode);
+        });
+      });
+    </script>
+  </body>
+</html>

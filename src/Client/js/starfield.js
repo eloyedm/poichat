@@ -18,12 +18,12 @@ Starfield.prototype.init = function (div) {
   var self = this;
 
   this.containerDiv = div;
-  self.width = $(this.containerDiv).innerWidth();
-  self.height = $(this.containerDiv).innerHeight();
+  self.width = $(window).innerWidth();
+  self.height = $(window).innerHeight();
 
   $(window).resize(function(e){
-    self.width = $(this.containerDiv).innerWidth();
-    self.height = $(this.containerDiv).innerHeight();
+    self.width = $(window).innerWidth();
+    self.height = $(window).innerHeight();
     self.canvas.width = self.width;
     self.canvas.height = self.height;
     self.draw();
