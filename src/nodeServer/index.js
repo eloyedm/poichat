@@ -151,7 +151,7 @@ io.on('connection', function(socket){
         chats.push(data.name)
         socket.broadcast.to(users[data.name]).emit('answer', {
           answer: data.answer,
-          sender: users[socket.name]
+          sender: socket.name
         })
       }
     }
@@ -161,12 +161,13 @@ io.on('connection', function(socket){
     var data = validateMessage(msg)
     // if(data){
       var conn = users[msg.name]
+      console.log("candidate enviado de "+ socket.name+ " a "+ msg.name);
       if(conn != null){
         console.log(msg.sender)
         socket.broadcast.to(users[msg.name]).emit(
           'candidate', {
           candidate: msg.candidate,
-          sender: msg.sender
+          sender: socket.name
         });
       }
       else{

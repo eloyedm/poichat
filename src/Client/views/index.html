@@ -28,6 +28,7 @@
     <div class="call">
       <button type="button" name="button" id="callBtn" >Call</button>
       <button type="button" name="buzz" id="buzz">Zumbido</button>
+      <button type="button" name="button" id="startCamera"></button>
     </div>
 
     <div class="CheckDiv">
@@ -245,7 +246,7 @@
       return false;
     });
 
-    $("#callBtn").click(function(){
+    $("#startCamera").click(function(){
       // var friend = $("#callUser").val();
       if(friend.length > 0 ){
         connectedUser= friend;
@@ -257,6 +258,20 @@
         alert("Por favor escribe el nombre de tu amigo");
       }
     });
+
+    $("#callBtn").click(function(){
+      yourConn.createOffer(
+        function(offer){
+          console.log(offer)
+          var newfriend = {name: friend, offer: offer, sender: friend};
+          renderer.send('offer', JSON.stringify(newfriend))
+          // socket.emit('offer', JSON.stringify(newfriend));
+          yourConn.setLocalDescription(offer);
+        },
+        function(error){
+          console.log(error);
+        });
+    })
 
     $("#buzz").click(function(){
       var friend = {
@@ -292,7 +307,7 @@
 
           yourConn.onicecandidate = function(event){
             if(event.candidate){
-              console.log(event.candidate);
+              console.log(friend);
               renderer.send('candidate', {
                 name: friend,
                 candidate: JSON.stringify(event.candidate),
@@ -329,6 +344,7 @@
       callback();
     }
 
+
     function handleOffer(offer, name){
       connectedUser = name;
       yourConn.setRemoteDescription(new RTCSessionDescription(offer));
@@ -337,6 +353,7 @@
       yourConn.setLocalDescription(answer)
           var newAnswer = {'name': friend, 'answer': answer, 'sender': friend};
           renderer.send('answer', JSON.stringify(newAnswer))
+          handleLogin('ok', function(){})
           // socket.emit('answer', JSON.stringify(newAnswer));
       }, function(error){
         alert("Error en respuesta")
