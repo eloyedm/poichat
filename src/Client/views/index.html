@@ -28,7 +28,7 @@
     <div class="call">
       <button type="button" name="button" id="callBtn" >Call</button>
       <button type="button" name="buzz" id="buzz">Zumbido</button>
-      <button type="button" name="button" id="startCamera"></button>
+      <button type="button" name="button" id="startCamera">Encender cámara</button>
     </div>
 
     <div class="CheckDiv">
@@ -323,17 +323,6 @@
             console.log('ICE stare:', yourConn.iceConnectionState);
           }
 
-          yourConn.createOffer(
-            function(offer){
-              console.log(offer)
-              var newfriend = {name: friend, offer: offer, sender: friend};
-              renderer.send('offer', JSON.stringify(newfriend))
-              // socket.emit('offer', JSON.stringify(newfriend));
-              yourConn.setLocalDescription(offer);
-            },
-            function(error){
-              console.log(error);
-            });
       }
 
       function errorCallback(error){

@@ -5,6 +5,7 @@ var bodyParser = require('body-parser');
 var dl = require('delivery');
 var fs = require('fs');
 var md5 = require('./node_modules/blueimp-md5/js/md5.min.js')
+var CryptoJS = require("crypto-js");
 
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -14,7 +15,7 @@ var mysql = require('mysql');
 var dbConnection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : 'diaz.1913',
+  password : 'homecoming96',
   database : 'senses'
 });
 
@@ -42,7 +43,7 @@ app.post("/register", function(req, res){
   var password = req.body.password
   var email = req.body.email
 
-  dbConnection.query('SELECT * FROM users WHERE name = ?',[userName], function(error, results, fields){
+  dbConnection.query('SELECT * FROM user WHERE username = ?',[userName], function(error, results, fields){
     if(results.length == 0){
       registerUser(userName, password, email)
     }
@@ -64,9 +65,9 @@ app.post('/login', function(req, res){
   //authentication with te db
   check(req.body.nameUser, req.body.pass, function(valid){
     if(valid){
-      dbConnection.query('SELECT name FROM users WHERE name != ? AND online = 1', [req.body.nameUser], function(error, results, fields){
+      dbConnection.query('SELECT username, status FROM user WHERE username != ? AND status != 0', [req.body.nameUser], function(error, results, fields){
         var newToken = randomize();
-        dbConnection.query('UPDATE users SET validToken = ? WHERE name = ?', [newToken, req.body.nameUser]);
+        dbConnection.query('UPDATE user SET validToken = ? WHERE username = ?', [newToken, req.body.nameUser]);
         res.json({user: req.body.nameUser, people: results, token: newToken});
       });
     }
@@ -251,8 +252,8 @@ function validateMessage(msg){
 }
 
 function registerUser(name, password, email){
-  var parameters = {name: name, password: password, email: email}
-  return dbConnection.query('INSERT INTO users SET ?', parameters, function(error, results, fields){
+  var parameters = {username: name, password: password, email: email, secret: randomize(false)}
+  return dbConnection.query('INSERT INTO user SET ?', parameters, function(error, results, fields){
     if(error)
     {
       throw error
@@ -265,7 +266,7 @@ function registerUser(name, password, email){
 
 function check(name, password, callback){
   var parameters = [name, password]
-  return dbConnection.query('SELECT name FROM users WHERE name = ? AND password = ?', parameters, function(error, results, fields){
+  return dbConnection.query('SELECT username FROM user WHERE username = ? AND password = ?', parameters, function(error, results, fields){
     if(results.length == 0)
     {
       callback(false)
@@ -279,7 +280,7 @@ function check(name, password, callback){
 }
 
 function setOnline(name){
-  return dbConnection.query('UPDATE users SET online = true WHERE name = ?', [name], function(error, results, fields){
+  return dbConnection.query('UPDATE user SET status = 1 WHERE username = ?', [name], function(error, results, fields){
     if(error){
       throw error
     }
@@ -290,7 +291,7 @@ function setOnline(name){
 }
 
 function getAvailableUsers(name){
-  var users = dbConnection.query('SELECT name FROM users WHERE name != ? AND online = 1', [name], function(error, results, fields){
+  var users = dbConnection.query('SELECT username FROM user WHERE username != ? AND status != 0', [name], function(error, results, fields){
     if(error){
       throw error
     }
@@ -301,9 +302,17 @@ function getAvailableUsers(name){
   return users
 }
 
-function randomize() {
+function randomize(crypt) {
+    crypt= typeof crypt !== 'undefined' ? crypt : false;
     var startString =  Math.random().toString(36).substr(2); // remove `0.`
-    return md5(startString);
+    console.log(startString);
+    if(crypt == true){
+      return md5(startString);
+    }else{
+      var hash = CryptoJS.SHA256(startString).toString();
+      return hash;
+    }
+
 };
 
 function validateToken(name, token, callback){

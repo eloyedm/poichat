@@ -76,7 +76,6 @@ ipcMain.on('opened-chat', (event, arg) => {
 
 ipcMain.on('chat message', (event, arg) => {
   // socket.emit('chat message', arg);
-  console.log("ahi va el mensaje");
   watchWindow.webContents.send('chat message', arg);
 })
 
@@ -104,7 +103,6 @@ ipcMain.on('file transfer', (event, arg) => {
 })
 
 ipcMain.on('chat message-r', (event, arg) => {
-  console.log(chats[arg.sender]);
   chats[arg.sender].webContents.send('chat message', arg);
 })
 
@@ -124,10 +122,6 @@ ipcMain.on('buzz-r', (event, arg) => {
 })
 
 ipcMain.on('candidate-r', (event, arg) =>{
-  console.log("candidate enviado por este wey"  );
-  console.log(arg);
-  console.log(chats[arg.sender]);
-
   // console.log(arg);
   // var currentChat = chats[arg.sender];
   // console.log(currentChat);
