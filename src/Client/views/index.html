@@ -315,6 +315,36 @@
         renderer.send('testPing', 'ok');
       })
 
+      $('#StartGame .fa-gamepad').click(function(){
+        console.log("si entra");
+        renderer.send('startGame', {friend: friend});
+        // $('body#chat>div.content>div[class^="mensajes"]').toggleClass("mensajes mensajes-min");
+        // $('div#Starfield').addClass('start');
+        // $('div#GameContainer').addClass('start');
+        //
+        // var container = $('div#Starfield').get(0);
+        // var starfield = new Starfield();
+        // starfield.init(container);
+        // starfield.start();
+        //
+        // var canvas = $('canvas#GameCanvas').get(0);
+        // canvas.width = 800;
+        // canvas.height = 600;
+        //
+        // var game = new Game();
+        // game.init(canvas);
+        // game.start();
+        //
+        // $(window).keydown(function(e){
+        //   var keycode = e.which;
+        //   game.keydown(keycode);
+        // });
+        // $(window).keyup(function(e){
+        //   var keycode = e.which;
+        //   game.keyup(keycode);
+        // });
+      })
+
       function handleLogin(success, callback){
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedua;
         //
@@ -418,34 +448,6 @@
       }
       //Parte del juego
       //Al hacer click en el boton de juego, hacemos mas pequeños los mensajes
-      $('label#StartGame').click(function(){
-        renderer.send('startGame', {friend: friend});
-        // $('body#chat>div.content>div[class^="mensajes"]').toggleClass("mensajes mensajes-min");
-        // $('div#Starfield').addClass('start');
-        // $('div#GameContainer').addClass('start');
-        //
-        // var container = $('div#Starfield').get(0);
-        // var starfield = new Starfield();
-        // starfield.init(container);
-        // starfield.start();
-        //
-        // var canvas = $('canvas#GameCanvas').get(0);
-        // canvas.width = 800;
-        // canvas.height = 600;
-        //
-        // var game = new Game();
-        // game.init(canvas);
-        // game.start();
-        //
-        // $(window).keydown(function(e){
-        //   var keycode = e.which;
-        //   game.keydown(keycode);
-        // });
-        // $(window).keyup(function(e){
-        //   var keycode = e.which;
-        //   game.keyup(keycode);
-        // });
-      })
     </script>
   </body>
 </html>

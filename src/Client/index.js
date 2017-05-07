@@ -110,7 +110,8 @@ ipcMain.on('statusChange', (event, arg) => {
 })
 
 ipcMain.on('startGame', (event, arg) => {
-  if(friends.indexOf(arg.friend) == -1){
+
+  if(friends.indexOf(arg.friend) != -1){
     var newGame = new BrowserWindow({width: 800, height: 600});
     newGame.loadURL('file://'+__dirname+'/views/game.html');
     newGame.webContents.openDevTools();
