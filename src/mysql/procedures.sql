@@ -54,22 +54,6 @@ begin
     where _idUser = idUser;
 end$$
 
-/*TABLA TEAM -------------------------------------------------------------------------------------------------*/
-
-create or replace sp_setTeam(
-	in _name varchar(255)
-)
-begin
-	insert into team set
-		name = _name;
-end$$
-
-create or replace sp_getTeam(
-	in _idTeam int unsigned
-)
-begin
-	select * from team where idTeam = _idTeam;
-end$$
 
 delimiter ;
 

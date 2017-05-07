@@ -18,6 +18,8 @@ create or replace table user(
     info varchar(255),
     status enum('conectado','ausente','ocupado','desconectado') default 'conectado' not null,
     picture text,
+    validToken varchar(64),
+    secret varchar(256),
     fk_idGame int unsigned,
     points int unsigned default 0,
     record int unsigned default 0,

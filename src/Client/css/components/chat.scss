@@ -1,78 +1,213 @@
-div.mensajes{
-  width: 936px;
-  max-width: 936px;
-  min-width: 936px;
-  height: 936px;
-  max-height: 936px;
-  min-height: 936px;
-  padding: 20px 25px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  canvas#canvaspot{
-    width: 0;
-    height: 0;
-    display: none;
-  }
-  ul#messages{
-    width: 100%;
-    height: 75%;
-    background-color: #b3e5fc;
-    border-radius: 5px;
-    box-shadow: 2px 2px 10px #888888;
-    margin: 0 0 15px;
-    padding: 20px 40px;
+body#chat{
+  overflow: hidden;
+  >div.leftColumn{
+    width: 300px;
+    height: 100%;
+    position: absolute;
+    z-index: 2;
     display: flex;
-    align-content: flex-end;
     flex-wrap: wrap;
-    &:hover, &:focus{
-      box-shadow: 5px 5px 20px #888888;
+    justify-content: center;
+    align-content: flex-start;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 15px;
+    background-color: $color_blue_hard;
+    *{
+      margin-bottom: 15px;
+      &:last-child{
+        margin-bottom: 0;
+      }
     }
-    li{
-      font-family: 'Century Gothic';
-      font-size: 15px;
-      flex: none;
+    >div.logo{
       width: 100%;
+      height: 100px;
+      overflow: hidden;
+      text-align: center;
+      >img{
+        width: auto;
+        height: auto;
+        max-height: 100%;
+      }
+    }
+    >div.userInfo{
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      >div.profilePicture{
+        width: 100%;
+        height: 150px;
+        overflow: hidden;
+        text-align: center;
+        display: block;
+        >img{
+          width: auto;
+          height: auto;
+          max-height: 100%;
+        }
+      }
+      >span.username{
+        font: 17px _Segoe_;
+        color: white;
+      }
+    }
+    >div.contacts{
+      width: 100%;
+      >span{
+        font: 15px _Segoe_;
+        color: white;
+      }
+      >ul.list{
+        width: 100%;
+        background-color: $color_blue_clear;
+        border-radius: 5px;
+        list-style: none;
+        margin: 0;
+        padding: 10px;
+        box-sizing: border-box;
+        >li{
+          font: 15px _Gothic_;
+          margin-bottom: 10px;
+          cursor: pointer;
+          &:hover{
+            text-decoration: underline;
+          }
+          &:last-child{
+            margin-bottom: 0;
+          }
+        }
+      }
     }
   }
-  form{
-    height: 15%;
+  >div.content{
     width: 100%;
+    height: 100%;
+    padding-left: 300px;
+    box-sizing: border-box;
     display: flex;
-    justify-content: space-between;
-    padding: 0;
-    margin: 0;
-    input#m{
-      display: inline-block;
-      width: 768px;
-      height: 100%;
-      box-shadow: 2px 2px 10px #888888;
-      outline: none;
-      font-family: 'Century Gothic';
-      font-size: 20px;
-      padding: 10px;
-      box-sizing: border-box;
-      &:hover, &:focus{
-        box-shadow: 5px 5px 20px #888888;
+    flex-wrap: wrap;
+    >div#Starfield{
+      width: 0;
+      height: 0;
+      &.start{
+        width: 75%;
+        height: 100%;
       }
     }
-    >button{
-      display: inline-block;
-      width: 150px;
-      height: 100px;
-      align-self: center;
-      border: 0;
-      border-radius: 5px;
-      background-color: #039be6;
-      box-shadow: 2px 2px 10px #888888;
-      font-family: 'Century Gothic';
-      font-weight: bold;
-      font-size: 30px;
-      color: white;
-      &:hover, &:focus{
-        box-shadow: 5px 5px 20px #888888;
+    >div#GameContainer{
+      width: 0;
+      height: 0;
+      &.start{
+        width: 800px;
+        margin: 0 auto;
       }
+    }
+    >div[class^='mensajes']{
+      width: 100%;
+      height: 100%;
+      padding: 20px 25px;
+      box-sizing: border-box;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      align-items: center;
+      >canvas#canvaspot{
+        width: 0;
+        height: 0;
+        display: none;
+      }
+      >ul#messages{
+        width: 100%;
+        height: 75%;
+        background-color: $color_blue_clear;
+        border-radius: 5px;
+        box-shadow: 2px 2px 10px #888888;
+        margin: 0 0 15px;
+        padding: 20px 40px;
+        display: flex;
+        align-content: flex-end;
+        flex-wrap: wrap;
+        &:hover, &:focus{
+          box-shadow: 5px 5px 20px #888888;
+        }
+        li{
+          font: 15px _Gothic_;
+          flex: none;
+          width: 100%;
+        }
+      }
+      >label{
+        font-size: 25px;
+        margin-right: 15px;
+        color: #4f4f4f;
+        cursor: pointer;
+        &:hover{
+          color: #101010;
+        }
+      }
+      >input{
+        display: none;
+      }
+      >div.call{
+        display: flex;
+        padding: 0;
+        margin: 0;
+        >button{
+          width: auto;
+          height: auto;
+          padding: 0;
+          margin: 0 15px 0 0;
+          background-color: #fff;
+          border: 0;
+          font-size: 25px;
+          color: #4f4f4f;
+          cursor: pointer;
+          &:hover{
+            color: #101010;
+          }
+        }
+      }
+      >form{
+        height: 15%;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 0;
+        margin: 0;
+        >input#m{
+          display: inline-block;
+          width: 80%;
+          height: 100%;
+          box-shadow: 2px 2px 10px #888888;
+          outline: none;
+          font-family: 'Century Gothic';
+          font-size: 20px;
+          padding: 10px;
+          box-sizing: border-box;
+          &:hover, &:focus{
+            box-shadow: 5px 5px 20px #888888;
+          }
+        }
+        >button{
+          display: inline-block;
+          width: 15%;
+          height: 100px;
+          align-self: center;
+          border: 0;
+          border-radius: 5px;
+          background-color: $color_blue_hard;
+          box-shadow: 2px 2px 10px #888888;
+          font: bold 30px _Gothic_;
+          color: white;
+          &:hover, &:focus{
+            box-shadow: 5px 5px 20px #888888;
+          }
+        }
+      }
+    }
+    >div[class$='-min']{
+      width: 25%;
     }
   }
 }
