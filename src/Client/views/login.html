@@ -3,29 +3,40 @@
   <head>
     <meta charset="utf-8">
     <title>Login with your username and password</title>
+    <link rel="stylesheet" href="./../css/main/_main.css">
   </head>
-  <body>
-    <div class="loginContainer form">
-      <form class="login" method="post">
-        <input type="text" id="userName" value="">
-        <input type="password" id="password" name="name" value="">
-
-        <button type="button" id="enviarLogin"name="button">Entrar</button>
-      </form>
+  <body id="login">
+    <div class="presentation">
+      <div class="logo">
+        <img src="../resources/img/logo-white.png" alt="">
+      </div>
+      <span>Chatea, habla, ve y escucha <br> a tus amigos</span>
+      <div class="conexion">
+        <img src="../resources/img/conexiones.png" alt="">
+      </div>
     </div>
-    <span class="startRegister form"> don't you have an account? come here </span>
-    <span class="startRegister form" style="display:none;"> go back to login </span>
-    <div class="registerContainer form" style="display:none">
-      <form class="register" method="post">
-        <label for="newUser"> Usuario</label>
-        <input type="text" id="newUser" value="">
-        <label for="email"> Email</label>
-        <input type="text" id="email" value="">
-        <label for="newPassword"> Password</label>
-        <input type="password" id="newPassword" value="">
+    <div class="formContainer">
+      <div class="user">
+        <img src="../resources/img/user-bgblue.png" alt="">
+      </div>
+      <div class="loginContainer form">
+        <form class="login" method="post">
+          <input type="text" id="userName" value="" placeholder="User">
+          <input type="password" id="password" name="name" value="" placeholder="Password">
+          <button type="button" id="enviarLogin"name="button">Entrar</button>
+        </form>
+      </div>
+      <span class="startRegister form"> don't you have an account? come here </span>
+      <div class="registerContainer form" style="display:none">
+        <form class="register" method="post">
+          <input type="text" id="newUser" value="" placeholder="User *">
+          <input type="text" id="email" value="" placeholder="Email *">
+          <input type="password" id="newPassword" value="" placeholder="Password *">
 
-        <button type="button" id="enviarRegistro"name="button">Entrar</button>
-      </form>
+          <button type="button" id="enviarRegistro"name="button">Entrar</button>
+        </form>
+      </div>
+      <span class="startRegister form" style="display:none;"> go back to login </span>
     </div>
     <script type="text/javascript" src="./../js/login.js"></script>
   </body>
