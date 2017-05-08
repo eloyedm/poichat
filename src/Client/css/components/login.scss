@@ -114,4 +114,84 @@ body#login{
       }
     }
   }
+  >div.leftColumn{
+    width: 300px;
+    height: 100%;
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: flex-start;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 15px;
+    background-color: $color_blue_hard;
+    *{
+      margin-bottom: 15px;
+      &:last-child{
+        margin-bottom: 0;
+      }
+    }
+    >div.logo{
+      width: 100%;
+      height: 100px;
+      overflow: hidden;
+      text-align: center;
+      >img{
+        width: auto;
+        height: auto;
+        max-height: 100%;
+      }
+    }
+    >div.userInfo{
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      >div.profilePicture{
+        width: 100%;
+        height: 150px;
+        overflow: hidden;
+        text-align: center;
+        display: block;
+        >img{
+          width: auto;
+          height: auto;
+          max-height: 100%;
+        }
+      }
+      >span.username{
+        font: 17px _Segoe_;
+        color: white;
+      }
+    }
+    >div.contacts{
+      width: 100%;
+      >span{
+        font: 15px _Segoe_;
+        color: white;
+      }
+      >ul.friendsContainer{
+        width: 100%;
+        background-color: $color_blue_clear;
+        border-radius: 5px;
+        list-style: none;
+        margin: 0;
+        padding: 10px;
+        box-sizing: border-box;
+        >li{
+          font: 15px _Gothic_;
+          margin-bottom: 10px;
+          cursor: pointer;
+          &:hover{
+            text-decoration: underline;
+          }
+          &:last-child{
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
 }

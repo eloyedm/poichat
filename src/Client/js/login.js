@@ -11,39 +11,46 @@ function chatWindow(){
   this.render = function(data){
     var docBody = $("body");
     var mainContainer = $("<div />", {
-      class: "mainContainer"
+      class: "leftColumn"
     });
-
-    var userTitle = $("<div />", {
-      class: "userTitle",
-      text: data.user
+    var logo = $('<div />',{
+      class: 'logo'
+    }).html('<img src="../resources/img/logo-white.png" alt="">');
+    var userInfo = $('<div />', {
+      class: 'userInfo'
     });
-
-    var userStatus = $("<select />", {
-      class: "statusList"
+      var username = $("<span />", {
+        class: "username",
+        text: data.user
+      });
+      var userStatus = $("<select />", {
+        class: "statusList"
+      });
+      var statusNames = ["En linea", "Ausente", "Ocupado"];
+      var statusName = "";
+      for(var i = 1; i< 4; i++){
+        statusName += '<option value="'+i+'">'+statusNames[i-1]+'</option>'
+      }
+      userStatus.html(statusName);
+    userInfo.html('<div class="profilePicture"><img src="../resources/img/user-bgwhite.png" alt=""></div>');
+    userInfo.append(username);
+    userInfo.append(userStatus);
+    var contacts = $('<div />',{
+      class: 'contacts'
     });
-
-    var statusNames = ["En linea", "Ausente", "Ocupado"];
-
-    var statusName = "";
-    for(var i = 1; i< 4; i++){
-      statusName += '<option value="'+i+'">'+statusNames[i-1]+'</option>'
-    }
-
-    userStatus.html(statusName);
-
-    userTitle.append(userStatus);
-    var friends = $("<ul />", {
-      class: "friendsContainer"
-    });
-
-    var friend = "";
-    for (person of data.people) {
-      friend += "<li class='friendContainer' data="+person.username+">"+person.username+"<span>"+person.status+"  </span></li>";
-    }
-    friends.html(friend);
-    mainContainer.append(friends);
-    mainContainer.append(userTitle);
+      var friends = $("<ul />", {
+        class: "friendsContainer"
+      });
+      var friend = "";
+      for (person of data.people) {
+        friend += "<li class='friendContainer' data="+person.username+">"+person.username+"<span>"+person.status+"  </span></li>";
+      }
+      friends.html(friend);
+    contacts.html('<span>Contactos</span>');
+    contacts.append(friends);
+    mainContainer.append(logo);
+    mainContainer.append(userInfo);
+    mainContainer.append(contacts);
     docBody.empty();
     docBody.append(mainContainer);
 
