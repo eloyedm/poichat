@@ -87,20 +87,25 @@ body#chat{
     box-sizing: border-box;
     display: flex;
     flex-wrap: wrap;
-    >div#Starfield{
+    >div[class^='video']{
+      display: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
       width: 0;
       height: 0;
-      &.start{
-        width: 75%;
-        height: 100%;
-      }
-    }
-    >div#GameContainer{
-      width: 0;
-      height: 0;
-      &.start{
-        width: 800px;
-        margin: 0 auto;
+      overflow: hidden;
+      padding: 15px;
+      box-sizing: border-box;
+      background-color: black;
+      box-shadow: 4px 5px 10px;
+      >video{
+        width: auto;
+        height: auto;
+        max-width: 100%;
+        box-sizing: border-box;
+        border: 3px solid white;
+        border-radius: 10px;
       }
     }
     >div[class^='mensajes']{
@@ -207,7 +212,9 @@ body#chat{
       }
     }
     >div[class$='-min']{
-      width: 25%;
+      width: 50%;
+      height: 100%;
+      display: flex;
     }
   }
 }

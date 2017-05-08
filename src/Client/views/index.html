@@ -28,9 +28,9 @@
       </div>
     </div>
     <div class="content">
-      <div id="Starfield"></div>
-      <div id="GameContainer">
-        <canvas id="GameCanvas"></canvas>
+      <div class="video">
+        <video autoplay id="local"></video>
+        <video autoplay id="pantalla"></video>
       </div>
       <div class="mensajes">
         <ul id="messages"></ul>
@@ -51,9 +51,6 @@
     </div>
     <audio id="buzzSound" src="./../audio/msn_nudge_sound.mp3" style="display:none;">
     </audio>
-    <video autoplay id="local"></video>
-
-    <video autoplay id="pantalla"></video>
     <div class="login">
       <input type="text" name="name" id="userName" value="">
       <button type="button" id="login" name="button">Login</button>
@@ -296,6 +293,8 @@
       $("#callBtn").click(function(){
         if(confirm("Deseas llamar a ese usuario?")){
           handleLogin('ok', function(){
+            $('body#chat>div.content>div[class^="video"]').toggleClass('video video-min');
+            $('body#chat>div.content>div[class^="mensajes"]').toggleClass('mensajes mensajes-min');
             yourConn.createOffer(
               function(offer){
                 console.log(offer)
@@ -373,6 +372,7 @@
         //
         function successCallback(stream){
           window.stream = stream;
+
             $("#local").attr("src", window.URL.createObjectURL(stream));
 
             yourConn.addStream(stream)
