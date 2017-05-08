@@ -39,6 +39,7 @@
         <label id="StartGame"><i class="fa fa-gamepad" aria-hidden="true"></i></label>
         <div class="call">
           <button type="button" name="button" id="callBtn"><i class="fa fa-phone" aria-hidden="true"></i></button>
+          <button type="button" name="hang" id="hangUp"><i class="fa fa-times-rectangle" aria-hidden="true"></i></button>
           <button type="button" name="buzz" id="buzz"><i class="fa fa-bullhorn" aria-hidden="true"></i></button>
           <button type="button" name="button" id="startCamera"><i class="fa fa-video-camera" aria-hidden="true"></i></button>
         </div>
@@ -216,6 +217,10 @@
         handleAnswer(arg.answer)
       })
 
+      renderer.on('leave', (event, arg) => {
+        handleLeave()
+      })
+
       renderer.on('candidate', (event, arg) => {
       // socket.on('candidate', function(data){
         console.log("si llega el candidate")
@@ -275,31 +280,42 @@
         return false;
       });
 
-      $("#startCamera").click(function(){
-        // var friend = $("#callUser").val();
-        if(friend.length > 0 ){
-          connectedUser= friend;
-          if(confirm("Deseas llamar a ese usuario?")){
-            handleLogin('ok',function(){});
-          }
-        }
-        else{
-          alert("Por favor escribe el nombre de tu amigo");
-        }
-      });
+      // $("#startCamera").click(function(){
+      //   // var friend = $("#callUser").val();
+      //   if(friend.length > 0 ){
+      //     connectedUser= friend;
+      //
+      //       handleLogin('ok',function(){});
+      //     }
+      //   }
+      //   else{
+      //     alert("Por favor escribe el nombre de tu amigo");
+      //   }
+      // });
 
       $("#callBtn").click(function(){
-        yourConn.createOffer(
-          function(offer){
-            console.log(offer)
-            var newfriend = {name: friend, offer: offer, sender: friend};
-            renderer.send('offer', JSON.stringify(newfriend))
-            // socket.emit('offer', JSON.stringify(newfriend));
-            yourConn.setLocalDescription(offer);
-          },
-          function(error){
-            console.log(error);
-          });
+        if(confirm("Deseas llamar a ese usuario?")){
+          handleLogin('ok', function(){
+            yourConn.createOffer(
+              function(offer){
+                console.log(offer)
+                var newfriend = {name: friend, offer: offer, sender: friend};
+                renderer.send('offer', JSON.stringify(newfriend))
+                // socket.emit('offer', JSON.stringify(newfriend));
+                yourConn.setLocalDescription(offer);
+              },
+              function(error){
+                console.log(error);
+              });
+          })
+        }
+      })
+
+      $("#hangUp").click(function(){
+        if(this.src != null){
+          renderer.send('leave', JSON.stringify({name: friend}));
+          handleLeave();
+        }
       })
 
       $("#buzz").click(function(){
@@ -381,7 +397,7 @@
             yourConn.oniceconnectionstatechange = function(){
               console.log('ICE stare:', yourConn.iceConnectionState);
             }
-
+            callback();
         }
 
         function errorCallback(error){
@@ -389,31 +405,44 @@
         }
 
         navigator.getUserMedia(constraints, successCallback, errorCallback);
-        callback();
       }
 
 
       function handleOffer(offer, name){
         connectedUser = name;
-        yourConn.setRemoteDescription(new RTCSessionDescription(offer));
-        yourConn.createAnswer(function(answer){
-        console.log(offer);
-        yourConn.setLocalDescription(answer)
-            var newAnswer = {'name': friend, 'answer': answer, 'sender': friend};
-            renderer.send('answer', JSON.stringify(newAnswer))
-            handleLogin('ok', function(){})
-            // socket.emit('answer', JSON.stringify(newAnswer));
-        }, function(error){
-          alert("Error en respuesta")
-        })
+        if(confirm("Deseas aceptar la llamada de "+ friend+"?")){
+          handleLogin('ok',function(){
+            console.log("y finalmente esto");
+            yourConn.setRemoteDescription(new RTCSessionDescription(offer));
+            yourConn.createAnswer(function(answer){
+            console.log(offer);
+            yourConn.setLocalDescription(answer)
+                var newAnswer = {'name': friend, 'answer': answer, 'sender': friend};
+                renderer.send('answer', JSON.stringify(newAnswer))
+                handleLogin('ok', function(){})
+                // socket.emit('answer', JSON.stringify(newAnswer));
+            }, function(error){
+              alert("Error en respuesta")
+            })
+          });
+        }
       }
 
       function handleAnswer(answer){
-        yourConn.setRemoteDescription(new RTCSessionDescription(answer));
+              yourConn.setRemoteDescription(new RTCSessionDescription(answer));
       }
 
       function handleCandidate(candidate){
         yourConn.addIceCandidate(new RTCIceCandidate(candidate));
+      }
+
+      function handleLeave(){
+        connectedUser = null
+        $("#local").src = null
+        $("#pantalla").src = null
+        yourConn.close()
+        yourConn.onicecandidate = null
+        yourConn.onaddstream = null
       }
 
       function handleFile(file, token, type){

@@ -24,7 +24,7 @@ function createWindow() {
   win = new BrowserWindow({width: 800, height: 600});
   win.loadURL('file://' + __dirname + '/views/login.html');
 
-  win.webContents.openDevTools();
+  // win.webContents.openDevTools();
 
   win.on('closed', () =>{
     win = null
@@ -90,6 +90,10 @@ ipcMain.on('answer', (event, arg) => {
   watchWindow.webContents.send('answer', arg);
 })
 
+ipcMain.on('leave', (event, arg) => {
+  watchWindow.webContents.send('answer', arg);
+})
+
 ipcMain.on('buzz', (event, arg) => {
   // socket.emit("buzz", arg);
   watchWindow.webContents.send('buzz', arg);
@@ -131,6 +135,10 @@ ipcMain.on('offer-r', (event, arg) => {
 ipcMain.on('answer-r', (event, arg) => {
   // socket.emit('answer', arg);
   chats[arg.sender].webContents.send('answer', arg);
+})
+
+ipcMain.on('leave-r', (event, arg) => {
+  chats[arg.sender].webContents.send('leave', arg);
 })
 
 ipcMain.on('buzz-r', (event, arg) => {

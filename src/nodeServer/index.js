@@ -146,8 +146,8 @@ io.on('connection', function(socket){
         if(users[result.name]){
           socket.emit('login', {success: false})
         } else {
-          users[result.name] = socket.id;
-          socket.name = result.name;
+          users[result.username] = socket.id;
+          socket.name = result.username;
           socket.deliverer = delivery;
           socket.emit('login', {success: true,})
         }
@@ -181,6 +181,16 @@ io.on('connection', function(socket){
           sender: socket.name
         })
       }
+    }
+  })
+
+  socket.on('leave', function(msg){
+    var data = validateMessage(msg)
+    if(data){
+      var conn = users[data.name]
+      socket.broadcast.to(users[data.name]).emit('leave', {
+        sender: socket.name
+      })
     }
   })
 

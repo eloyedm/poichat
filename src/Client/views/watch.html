@@ -36,6 +36,10 @@
       socket.emit("answer", arg);
     })
 
+    renderer.on('leave', (event, arg) => {
+      socket.emit('leave', arg);
+    })
+
     renderer.on('testPing', (event, arg) => {
       console.log('llegueee');
     })
@@ -55,6 +59,7 @@
     })
 
     socket.on('chat message', function(msg){
+      console.log("si llega al watch")
       renderer.send('chat message-r', msg)
     })
 
@@ -68,6 +73,10 @@
 
     socket.on('answer', function(data){
       renderer.send('answer-r', data)
+    })
+
+    socket.on('leave', function(data){
+      renderer.send('leave-r', data)
     })
 
     socket.on('candidate', function(data){
