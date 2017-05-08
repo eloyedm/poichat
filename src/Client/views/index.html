@@ -33,7 +33,10 @@
         <video autoplay id="pantalla"></video>
       </div>
       <div class="mensajes">
-        <ul id="messages"></ul>
+        <div id="messages">
+          <div id="old"></div>
+          <div id="new"></div>
+        </div>
         <label for="archivo"><i class="fa fa-paperclip" aria-hidden="true" alt="upload file"></i></label>
         <input type="file" id="archivo" name="archivo" value="">
         <label id="StartGame"><i class="fa fa-gamepad" aria-hidden="true"></i></label>
@@ -195,7 +198,7 @@
           class: arg.origin,
           html: pMsg
         })
-        $('#messages').append(newMessage);
+        $('#messages > #new').append(newMessage);
       })
 
       renderer.on('buzz', (event, arg) => {

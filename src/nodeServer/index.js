@@ -17,7 +17,7 @@ var mysql = require('mysql');
 var dbConnection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : '',
+  password : 'homecoming96',
   database : 'senses'
 });
 
@@ -114,7 +114,9 @@ io.on('connection', function(socket){
            socket.broadcast.to(users[data.name]).emit('chat message', {
              origin: "other",
              message: data.message,
-             sender: socket.name
+             sender: socket.name,
+             token: data.token,
+             crypting: data.crypting
            })
            socket.broadcast.to(users[socket.name]).emit('chat message', {
              origin: "own",

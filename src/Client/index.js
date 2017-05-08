@@ -3,6 +3,7 @@ const {ipcMain} = require('electron')
 const path = require('path');
 const url = require('url');
 var io = require('./node_modules/socket.io-client/dist/socket.io.js');
+var CryptoJS = require('crypto-js');
 // const Backbone = require('backbone')
 // var WebSocket = require('ws');
 
@@ -16,10 +17,34 @@ var userLine = '';
 var returnLine = '';
 var socket = '';
 var token = '';
+var friendsTokens = {};
 
 var chatUser = '';
 var friends = new Array();
+var crypting = true;
 
+var JsonFormatter = { stringify: function (cipherParams) {
+  var jsonObj = { ct: cipherParams.ciphertext.toString(CryptoJS.enc.Base64) };
+  if (cipherParams.iv) {
+     jsonObj.iv = cipherParams.iv.toString();
+   }
+   if (cipherParams.salt) {
+     jsonObj.s = cipherParams.salt.toString();
+   }
+   return JSON.stringify(jsonObj);
+ }, parse: function (jsonStr) {
+      var jsonObj = JSON.parse(jsonStr);
+      var cipherParams = CryptoJS.lib.CipherParams.create({
+        ciphertext: CryptoJS.enc.Base64.parse(jsonObj.ct) });
+        if (jsonObj.iv) {
+          cipherParams.iv = CryptoJS.enc.Hex.parse(jsonObj.iv)
+        }
+        if (jsonObj.s) {
+          cipherParams.salt = CryptoJS.enc.Hex.parse(jsonObj.s)
+        }
+        return cipherParams;
+      }
+    }
 function createWindow() {
   win = new BrowserWindow({width: 800, height: 600});
   win.loadURL('file://' + __dirname + '/views/login.html');
@@ -66,6 +91,10 @@ ipcMain.on('new-chat', (event, arg) => {
     var newChat = new BrowserWindow({width: 800, height: 600});
     newChat.loadURL('file://'+__dirname+'/views/index.html');
     newChat.webContents.openDevTools();
+    // newChat.on('close', () => {
+    //
+    // })
+    newChat.started = false;
     chats[arg.friend] = newChat;
   }
 })
@@ -76,7 +105,28 @@ ipcMain.on('opened-chat', (event, arg) => {
 })
 
 ipcMain.on('chat message', (event, arg) => {
-  // socket.emit('chat message', arg);
+  // socket.emit('chat message', arg
+  var tempArg = JSON.parse(arg);
+  if(chats[tempArg.name]['started'] != true){
+    tempArg.token = token;
+    tempArg.crypting = crypting;
+  }
+  if(crypting){
+    var mensaje = tempArg.message;
+    mensaje = CryptoJS.AES.encrypt(mensaje, token);
+    mensaje = CryptoJS.enc.Utf8.parse(mensaje);
+    console.log(mensaje);
+    tempArg.message = mensaje;
+    // mensaje =CryptoJS.enc.Utf8.parse(words);
+    // console.log(mensaje);
+    // var decrypted = CryptoJS.AES.decrypt(words, token)
+    // console.log(decrypted);
+    // var utf8 = decrypted.toString(CryptoJS.enc.Utf8)
+    // console.log(utf8)
+  }
+
+  arg = JSON.stringify(tempArg);
+  console.log(arg);
   watchWindow.webContents.send('chat message', arg);
 })
 
@@ -124,6 +174,20 @@ ipcMain.on('startGame', (event, arg) => {
 })
 
 ipcMain.on('chat message-r', (event, arg) => {
+  console.log(arg);
+  if(arg.token != 'undefined'){
+    var tempName = arg.sender;
+    friendsTokens[tempName] = {};
+    friendsTokens[tempName]['token'] = arg.token;
+    friendsTokens[tempName]['crypting'] = arg.crypting
+  }
+  friendsTokens[arg.sender]['crypting']
+  if(friendsTokens[arg.sender]['crypting']){
+    var words = CryptoJS.enc.Utf8.stringify(arg.message);
+    arg.message = CryptoJS.AES.decrypt(words, friendsTokens[arg.sender]['token'])
+    var utf8 = arg.message.toString(CryptoJS.enc.Utf8)
+    arg.message = utf8
+  }
   chats[arg.sender].webContents.send('chat message', arg);
 })
 
