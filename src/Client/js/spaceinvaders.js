@@ -118,7 +118,8 @@ function Game() {
     invaderFiles: 10,
     shipSpeed: 120,
     levelDifficultyMultiplier: 0.2,
-    pointsPerInvader: 5
+    pointsPerInvader: 5,
+    addVel: 0
   }
 
   this.lives = 3;
@@ -215,6 +216,11 @@ Game.prototype.keyup = function(keyCode) {
   delete this.pressedKeys[keyCode];
   if(this.currentState() && this.currentState().keyup) {
     this.currentState().keyup(this, keyCode);
+  }
+};
+Game.prototype.addVel = function () {
+  if (this.stateStack[0].constructor == PlayState) {
+    this.stateStack[0].config.addVel += 0.005;
   }
 };
 
@@ -316,6 +322,7 @@ PlayState.prototype.enter = function(game) {
   this.invaderCurrentVelocity = this.invaderInitialVelocity;
   this.invaderVelocity = {x: -this.invaderInitialVelocity, y:0};
   this.invaderNextVelocity = null;
+  this.config.addVel = 0;
 };
 PlayState.prototype.update = function(game, dt) {
   if(game.pressedKeys[37]) {
@@ -356,7 +363,7 @@ PlayState.prototype.update = function(game, dt) {
   var hitLeft = false, hitRight = false, hitBottom = false;
   for(i=0; i<this.invaders.length; i++) {
     var invader = this.invaders[i];
-    var newx = invader.x + this.invaderVelocity.x * dt;
+    var newx = invader.x + this.invaderVelocity.x * (dt + this.config.addVel);
     var newy = invader.y + this.invaderVelocity.y * dt;
     if(hitLeft == false && newx < game.gameBounds.left) {
       hitLeft = true;
