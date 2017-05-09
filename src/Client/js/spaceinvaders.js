@@ -435,6 +435,8 @@ PlayState.prototype.update = function(game, dt) {
       game.sounds.playSound('bang');
       this.config.isExterminated = true;
       console.log(this.config.addVel);
+      var event = new CustomEvent('accelerate', { cantity: 0.5 });
+      window.dispatchEvent(event);
       /*MANDAMOS UDP CON EL CAMBIO DE VELOCIDAD*/
     }
   }

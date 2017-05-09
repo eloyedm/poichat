@@ -18,7 +18,7 @@ var mysql = require('mysql');
 var dbConnection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : 'homecoming96',
+  password : 'diaz.1913',
   database : 'senses'
 });
 
@@ -124,6 +124,7 @@ io.on('connection', function(socket){
              message: data.message,
              sender: socket.name
            })
+
          }
          else{
           //  socket.broadcast.to(users[socket.name]).emit('notHere', {
@@ -141,6 +142,7 @@ io.on('connection', function(socket){
            message: data.message
          });
        }
+       console.log(users[socket.name])
     } catch (e) {
        data = {};
     }
@@ -292,6 +294,7 @@ io.on('connection', function(socket){
   });
 
   socket.on('getOldMessages', function(msg){
+    console.log(users[socket.name])
     validateToken(socket.name, msg.token, function(result){
       if(result != null){
         if(pending[socket.name] != undefined ){
@@ -302,9 +305,16 @@ io.on('connection', function(socket){
               messages:  pending[socket.name][msg.friend],
               friend: msg.friend
             })
+            socket.emit('getOldMessages', {
+              messages: pending[socket.name][msg.friend],
+              friend: msg.friend
+            })
           }else{
             socket.broadcast.to(users[socket.name]).emit('getOldMessages', {
               messages:  null
+            })
+            socket.emit('getOldMessages', {
+              messages: null
             })
           }
         }

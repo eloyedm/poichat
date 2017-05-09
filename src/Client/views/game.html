@@ -33,7 +33,7 @@
     <script type="text/javascript" src="./../js/spaceinvaders.js"></script>
     <script type="text/javascript">
       var $ = global.jQuery = require('./../node_modules/jquery/dist/jquery.js');
-
+      const renderer = require('electron').ipcRenderer;
       $(document).ready(function(){
         var container = $('div#Starfield').get(0);
         var starfield = new Starfield();
@@ -56,6 +56,14 @@
           var keycode = e.which;
           game.keyup(keycode);
         });
+
+        $(window).on('accelerate', function(data){
+          renderer.send('accelerate', data)
+        })
+
+        renderer.on('accelerate', (event, arg) => {
+          game.addVel();
+        })
       });
     </script>
   </body>
