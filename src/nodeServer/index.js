@@ -7,6 +7,7 @@ var fs = require('fs');
 var md5 = require('./node_modules/blueimp-md5/js/md5.min.js')
 var nodemailer = require('nodemailer')
 var CryptoJS = require('crypto-js');
+var pending = {};
 
 
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
@@ -125,9 +126,13 @@ io.on('connection', function(socket){
            })
          }
          else{
-           socket.broadcast.to(users[socket.name]).emit('notHere', {
-              error: "No es posible entregar el mensaje en este momento"
-           })
+          //  socket.broadcast.to(users[socket.name]).emit('notHere', {
+          //     error: "No es posible entregar el mensaje en este momento"
+          //  })
+            if(!pending[data.name]){
+              pending[data.name] = {};
+            }
+            pending[data.name] = checkForPreviousMessages(pending[data.name], socket.name, data);
          }
        }
        else{
@@ -139,6 +144,7 @@ io.on('connection', function(socket){
     } catch (e) {
        data = {};
     }
+    console.log(pending);
   });
 
   socket.on('login', function(msg){
@@ -284,6 +290,32 @@ io.on('connection', function(socket){
       }
     });
   });
+
+  socket.on('getOldMessages', function(msg){
+    validateToken(socket.name, msg.token, function(result){
+      if(result != null){
+        if(pending[socket.name] != undefined ){
+          console.log(socket.name)
+          if(pending[socket.name][msg.friend] != undefined){
+            console.log('hay mensajes');
+            socket.broadcast.to(users[socket.name]).emit('getOldMessages', {
+              messages:  pending[socket.name][msg.friend],
+              friend: msg.friend
+            })
+          }else{
+            socket.broadcast.to(users[socket.name]).emit('getOldMessages', {
+              messages:  null
+            })
+          }
+        }
+        else{
+          socket.broadcast.to(users[socket.name]).emit('getOldMessages', {
+            messages:  null
+          })
+        }
+      }
+    })
+  })
 })
 
 function validateMessage(msg){
@@ -294,6 +326,16 @@ function validateMessage(msg){
   catch(e){
     return false
   }
+}
+
+function checkForPreviousMessages(parent, name, data){
+  if(!parent[name])
+  {
+    parent[name] = [];
+  }
+  parent[name].push(data);
+
+  return parent;
 }
 
 function registerUser(name, password, email, callback){

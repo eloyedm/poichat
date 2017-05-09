@@ -101,6 +101,7 @@ ipcMain.on('new-chat', (event, arg) => {
 
 ipcMain.on('opened-chat', (event, arg) => {
   event.sender.send('user-return', friends[friends.length-1])
+  watchWindow.webContents.send('getOldMessages', {token: token, friend: friends[friends.length-1]})
   userLine = event.sender
 })
 
@@ -117,6 +118,7 @@ ipcMain.on('chat message', (event, arg) => {
     mensaje = CryptoJS.enc.Utf8.parse(mensaje);
     console.log(mensaje);
     tempArg.message = mensaje;
+    tempArg.token = token;
     // mensaje =CryptoJS.enc.Utf8.parse(words);
     // console.log(mensaje);
     // var decrypted = CryptoJS.AES.decrypt(words, token)
@@ -223,6 +225,9 @@ ipcMain.on('file transfer-r', (event, arg) => {
   chats[arg.sender].webContents.send('file transfer', arg);
 })
 
+ipcMain.on('oldMessages-r', (event, arg) => {
+  console.log(arg)
+})
 // var conn = new WebSocket('ws://localhost:8080');
 // conn.onopen = function(e) {
 //     console.log("Connection established!");
