@@ -229,8 +229,10 @@ io.on('connection', function(socket){
 
   socket.on('buzz', function(msg){
     var data = validateMessage(msg)
+    console.log(data);
     if(data){
       if(users[data.name]){
+        console.log(data);
         socket.broadcast.to(users[data.name]).emit(
           'buzz', {
             buzz: "pzzzzz",
@@ -301,18 +303,11 @@ io.on('connection', function(socket){
           console.log(socket.name)
           if(pending[socket.name][msg.friend] != undefined){
             console.log('hay mensajes');
-            socket.broadcast.to(users[socket.name]).emit('getOldMessages', {
-              messages:  pending[socket.name][msg.friend],
-              friend: msg.friend
-            })
             socket.emit('getOldMessages', {
               messages: pending[socket.name][msg.friend],
-              friend: msg.friend
+              friend: msg.friend,
             })
           }else{
-            socket.broadcast.to(users[socket.name]).emit('getOldMessages', {
-              messages:  null
-            })
             socket.emit('getOldMessages', {
               messages: null
             })

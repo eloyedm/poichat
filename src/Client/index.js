@@ -46,7 +46,7 @@ var JsonFormatter = { stringify: function (cipherParams) {
       }
     }
 function createWindow() {
-  win = new BrowserWindow({width: 800, height: 600});
+  win = new BrowserWindow({width: 400, height: 300});
   win.loadURL('file://' + __dirname + '/views/login.html');
 
   // win.webContents.openDevTools();
@@ -88,14 +88,20 @@ ipcMain.on('new-chat', (event, arg) => {
   currentUser = arg.user
   if(friends.indexOf(arg.friend) == -1){
     friends.push(arg.friend)
-    var newChat = new BrowserWindow({width: 800, height: 600});
+    var newChat = new BrowserWindow({width: 400, height: 300});
     newChat.loadURL('file://'+__dirname+'/views/index.html');
     newChat.webContents.openDevTools();
     // newChat.on('close', () => {
     //
     // })
     newChat.started = false;
+    newChat.friend = arg.friend;
     chats[arg.friend] = newChat;
+
+    chats[arg.friend].on('close', (e) =>{
+      var d = e.sender.friend;
+      delete chats[d];
+    });
   }
 })
 
@@ -116,20 +122,16 @@ ipcMain.on('chat message', (event, arg) => {
     var mensaje = tempArg.message;
     mensaje = CryptoJS.AES.encrypt(mensaje, token);
     mensaje = CryptoJS.enc.Utf8.parse(mensaje);
-    console.log(mensaje);
     tempArg.message = mensaje;
     tempArg.token = token;
-    // mensaje =CryptoJS.enc.Utf8.parse(words);
-    // console.log(mensaje);
-    // var decrypted = CryptoJS.AES.decrypt(words, token)
-    // console.log(decrypted);
-    // var utf8 = decrypted.toString(CryptoJS.enc.Utf8)
-    // console.log(utf8)
   }
 
   arg = JSON.stringify(tempArg);
-  console.log(arg);
   watchWindow.webContents.send('chat message', arg);
+
+
+  // var tempChat = event.getPosition()
+  // console.log(tempChat)
 })
 
 ipcMain.on('offer', (event, arg) => {
@@ -176,7 +178,6 @@ ipcMain.on('startGame', (event, arg) => {
 })
 
 ipcMain.on('chat message-r', (event, arg) => {
-  console.log(arg);
   if(arg.token != 'undefined'){
     var tempName = arg.sender;
     friendsTokens[tempName] = {};
@@ -210,6 +211,8 @@ ipcMain.on('leave-r', (event, arg) => {
 ipcMain.on('buzz-r', (event, arg) => {
   // socket.emit("buzz", arg);
   chats[arg.sender].webContents.send('buzz', arg);
+  chats[arg.sender].flashFrame(true);
+
 })
 
 ipcMain.on('candidate-r', (event, arg) =>{
@@ -226,7 +229,19 @@ ipcMain.on('file transfer-r', (event, arg) => {
 })
 
 ipcMain.on('oldMessages-r', (event, arg) => {
-  console.log(arg)
+  var mensajes = [];
+  console.log(arg.friend);
+  for (message of arg.messages) {
+    if(message.crypting == true){
+      var newMensaje;
+      var words = CryptoJS.enc.Utf8.stringify(message.message);
+      newMensaje = CryptoJS.AES.decrypt(words, message['token']);
+      var utf8 = newMensaje.toString(CryptoJS.enc.Utf8);
+      newMensaje = utf8;
+      chats[arg.friend].webContents.send('old-message', newMensaje);
+      mensajes.push(newMensaje);
+    }
+  }
 })
 // var conn = new WebSocket('ws://localhost:8080');
 // conn.onopen = function(e) {

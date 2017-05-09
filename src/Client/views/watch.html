@@ -25,6 +25,7 @@
     })
 
     renderer.on('buzz', (event, arg) => {
+      console.log(arg);
       socket.emit('buzz', arg);
     })
 
@@ -68,6 +69,7 @@
     })
 
     socket.on("buzz-r", function(data){
+      console.log(data)
       renderer.send('buzz-r', data)
     })
 

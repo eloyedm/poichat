@@ -230,6 +230,11 @@
       renderer.on('file transfer', (event, arg) => {
         handleFile(arg.file, arg.token, arg.type)
       })
+
+      renderer.on('old-message', (event, arg) => {
+        console.log(arg)
+        handleOldMessage(arg)
+      })
       //
       // socket.on('notHere', function(data){
       //   alert(data.error)
@@ -280,19 +285,6 @@
         return false;
       });
 
-      // $("#startCamera").click(function(){
-      //   // var friend = $("#callUser").val();
-      //   if(friend.length > 0 ){
-      //     connectedUser= friend;
-      //
-      //       handleLogin('ok',function(){});
-      //     }
-      //   }
-      //   else{
-      //     alert("Por favor escribe el nombre de tu amigo");
-      //   }
-      // });
-
       $("#callBtn").click(function(){
         if(confirm("Deseas llamar a ese usuario?")){
           handleLogin('ok', function(){
@@ -321,10 +313,10 @@
       })
 
       $("#buzz").click(function(){
-        var friend = {
-          name: $("#callUser").val()
+        var friendBuzzed = {
+          name: friend
         };
-        renderer.send("buzz", JSON.stringify(friend));
+        renderer.send("buzz", JSON.stringify(friendBuzzed));
         // socket.emit("buzz", JSON.stringify(friend));
       })
 
@@ -466,6 +458,15 @@
         linkToFile.append(titleFile);
         fileReceived.append(linkToFile);
         $("#messages").append(fileReceived);
+      }
+
+      function handleOldMessage(message){
+        var newMessage = $("<li>", {
+          class: 'oldMessage',
+          html: message
+        });
+
+        $("#messages #old").append(newMessage);
       }
 
       function makeid()
