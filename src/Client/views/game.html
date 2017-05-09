@@ -51,10 +51,6 @@
         $(window).keydown(function(e){
           var keycode = e.which;
           game.keydown(keycode);
-          if (keycode == 73) {
-            game.addVel();
-            console.log(game);
-          }
         });
         $(window).keyup(function(e){
           var keycode = e.which;

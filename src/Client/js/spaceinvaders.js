@@ -119,7 +119,8 @@ function Game() {
     shipSpeed: 120,
     levelDifficultyMultiplier: 0.2,
     pointsPerInvader: 5,
-    addVel: 0
+    addVel: 0,
+    isExterminated: false
   }
 
   this.lives = 3;
@@ -221,6 +222,14 @@ Game.prototype.keyup = function(keyCode) {
 Game.prototype.addVel = function () {
   if (this.stateStack[0].constructor == PlayState) {
     this.stateStack[0].config.addVel += 0.005;
+  }
+};
+Game.prototype.getVel = function () {
+  if (this.stateStack[0].constructor == PlayState) {
+    if (this.stateStack[0].config.isExterminated) {
+      this.stateStack[0].config.isExterminated =  false;
+      return this.stateStack[0].config.addVel;
+    }
   }
 };
 
@@ -424,6 +433,8 @@ PlayState.prototype.update = function(game, dt) {
     if(bang) {
       this.invaders.splice(i--, 1);
       game.sounds.playSound('bang');
+      this.config.isExterminated = true;
+      console.log(this.config.addVel);
       /*MANDAMOS UDP CON EL CAMBIO DE VELOCIDAD*/
     }
   }
@@ -667,6 +678,10 @@ function GameLoop(game) {
     }
     if(currentState.draw) {
       currentState.draw(game, dt, ctx);
+    }
+    var vel = game.getVel();
+    if (vel !== undefined) {
+        game.addVel();
     }
   }
 }
