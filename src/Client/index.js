@@ -218,9 +218,13 @@ ipcMain.on('chat message-r', (event, arg) => {
   }
   friendsTokens[arg.sender]['crypting']
   if(friendsTokens[arg.sender]['crypting']){
+    console.log(arg.message)
     var words = CryptoJS.enc.Utf8.stringify(arg.message);
+    console.log(words)
     arg.message = CryptoJS.AES.decrypt(words, friendsTokens[arg.sender]['token'])
+    console.log(arg.message)
     var utf8 = arg.message.toString(CryptoJS.enc.Utf8)
+    console.log(utf8)
     arg.message = utf8
   }
   chats[arg.sender].webContents.send('chat message', arg);
@@ -298,12 +302,18 @@ ipcMain.on('acceptGame-r', (event, arg) => {
 })
 
 ipcMain.on('recoverMessages-r', (event, arg) => {
-  for (mesasage of arg.messages) {
-    var oldMessage = JSON.parse(message.message);
+  console.log(arg.messages);
+  for (indMensaje of arg.messages) {
+    var oldMessage = JSON.parse(indMensaje.message);
+    console.log(oldMessage)
     var words = CryptoJS.enc.Utf8.stringify(oldMessage);
+    console.log(words)
     oldMessage = CryptoJS.AES.decrypt(words, secret)
-    var utf8 = arg.message.toString(CryptoJS.enc.Utf8)
-    oldMessage = utf8
+    console.log(oldMessage)
+    var utf8 = oldMessage.toString(CryptoJS.enc.Utf8)
+    oldMessage = utf8;
+    console.log(oldMessage)
+    chats[arg.friend].webContents.send('recoverMessages', {message: oldMessage});
   }
   // chats[arg.friend].webContents.send('recoverMessages', arg)
 })

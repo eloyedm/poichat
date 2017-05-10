@@ -198,7 +198,7 @@
       renderer.on('chat message', (event, arg) => {
         var pMsg =  emoticons.replace(arg.message);
         var newMessage = $("<li>", {
-          class: arg.origin,
+          class: 'other',
           html: pMsg
         })
         $('#messages > #new').append(newMessage);
@@ -236,7 +236,9 @@
       })
 
       renderer.on('save-before-close', (event, arg) =>{
-        renderer.send('save-before-close', {messages: handleSaveMessages(), friend: friend});
+        if(handleSaveMessages() != null){
+          renderer.send('save-before-close', {messages: handleSaveMessages(), friend: friend});
+        }
       })
 
       renderer.on('startGame', (event, arg)=>{
@@ -245,6 +247,15 @@
         }else{
           renderer.send('acceptGame', {friend: friend, answer: false})
         }
+      })
+
+      renderer.on('recoverMessages', (event, arg) => {
+        var pMsg =  emoticons.replace(arg.message);
+        var newMessage = $("<li>", {
+          class: 'other',
+          html: pMsg
+        })
+        $('#messages > #old').append(newMessage);
       })
 
       //
@@ -256,11 +267,20 @@
       $('form').submit((event) => {
         // ipcRenderer.send('response-message', $('#m').val());
         event.preventDefault();
+        var msgToSend = $('#m').val();
+
         var msg = {
           name: friend,
-          message: $('#m').val()
+          message: msgToSend
         }
         renderer.send('chat message', JSON.stringify(msg))
+
+        var pMsg =  emoticons.replace(msgToSend);
+        var newMessage = $("<li>", {
+          class: 'own',
+          html: pMsg
+        })
+        $('#messages > #new').append(newMessage);
 
         var fileSended = $("#archivo")[0].files[0];
         if(fileSended != null){
@@ -460,11 +480,15 @@
 
       function handleSaveMessages(){
         var messages = [];
-        $("#new li").each(function(){
+        $("#new li.other").each(function(){
           messages.push(this.textContent);
         })
-
-        return messages;
+        if(messages.length > 0){
+          return messages;
+        }
+        else{
+          return null;
+        }
       }
 
       function makeid()
