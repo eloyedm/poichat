@@ -51,8 +51,10 @@ function chatWindow(){
     mainContainer.append(logo);
     mainContainer.append(userInfo);
     mainContainer.append(contacts);
+    var content = $('div.content');
     docBody.empty();
     docBody.append(mainContainer);
+    docBody.append(content);
 
     $(".friendContainer").click(function(){
       var friendName = this.getAttribute('data');

@@ -684,7 +684,7 @@ function GameLoop(game) {
     }
     var vel = game.getVel();
     if (vel !== undefined) {
-        game.addVel();
+        //MANDAR UD
     }
   }
 }
