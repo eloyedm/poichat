@@ -1,7 +1,8 @@
-const {app, BrowserWindow} = require('electron')
+const {app, BrowserWindow, Tray, clipboard} = require('electron')
 const {ipcMain} = require('electron')
 const path = require('path');
 const url = require('url');
+const nativeImage = require('electron').nativeImage
 var io = require('./node_modules/socket.io-client/dist/socket.io.js');
 var CryptoJS = require('crypto-js');
 // const Backbone = require('backbone')
@@ -22,6 +23,7 @@ var friendsTokens = {};
 var chatUser = '';
 var friends = new Array();
 var crypting = true;
+let secret = '';
 
 var JsonFormatter = { stringify: function (cipherParams) {
   var jsonObj = { ct: cipherParams.ciphertext.toString(CryptoJS.enc.Base64) };
@@ -45,10 +47,16 @@ var JsonFormatter = { stringify: function (cipherParams) {
         return cipherParams;
       }
     }
-function createWindow() {
-  win = new BrowserWindow({width: 400, height: 300});
-  win.loadURL('file://' + __dirname + '/views/login.html');
 
+function createWindow() {
+  console.log(__dirname + '/resources/img/graph-icon.png');
+  win = new BrowserWindow({width: 800, height: 600});
+  win.loadURL('file://' + __dirname + '/views/login.html');
+  var imageN = nativeImage.createFromPath(__dirname + '/resources/img/Accept-icon.png');
+
+  const image = clipboard.readImage()
+  const appIcon = new Tray(image)
+  win.setIcon(imageN)
   // win.webContents.openDevTools();
 
   win.on('closed', () =>{
@@ -74,7 +82,8 @@ ipcMain.on('succeedLogin', (event, arg) =>{
   userName = {name: arg.name, token: arg.token}
   chatUser = arg.name
   token = arg.token
-  watchWindow = new BrowserWindow({parent: win,width: 300, height: 200});
+  secret = arg.secret
+  watchWindow = new BrowserWindow({parent: win,width: 300, height: 200, show: false, transparent: true});
   watchWindow.loadURL('file://' + __dirname + '/views/watch.html');
   watchWindow.webContents.openDevTools();
 })
@@ -88,7 +97,7 @@ ipcMain.on('new-chat', (event, arg) => {
   currentUser = arg.user
   if(friends.indexOf(arg.friend) == -1){
     friends.push(arg.friend)
-    var newChat = new BrowserWindow({width: 400, height: 300});
+    var newChat = new BrowserWindow({width: 800, height: 600});
     newChat.loadURL('file://'+__dirname+'/views/index.html');
     newChat.webContents.openDevTools();
     // newChat.on('close', () => {
@@ -100,7 +109,9 @@ ipcMain.on('new-chat', (event, arg) => {
 
     chats[arg.friend].on('close', (e) =>{
       var d = e.sender.friend;
+      chats[d].webContents.send('save-before-close', null);
       delete chats[d];
+      delete friends[d];
     });
   }
 })
@@ -177,6 +188,17 @@ ipcMain.on('startGame', (event, arg) => {
   }
 })
 
+ipcMain.on('save-before-close', (event, arg) =>{
+  console.log(arg);
+  var mensajes = []
+  for (message of arg.messages) {
+    mensaje = CryptoJS.AES.encrypt(message, secret);
+    mensaje = CryptoJS.enc.Utf8.parse(mensaje);
+    mensajes.push(mensaje)
+  }
+  watchWindow.webContents.send('store-messages', {messages: mensajes, token: token});
+})
+
 ipcMain.on('chat message-r', (event, arg) => {
   if(arg.token != 'undefined'){
     var tempName = arg.sender;
@@ -238,7 +260,7 @@ ipcMain.on('oldMessages-r', (event, arg) => {
       newMensaje = CryptoJS.AES.decrypt(words, message['token']);
       var utf8 = newMensaje.toString(CryptoJS.enc.Utf8);
       newMensaje = utf8;
-      chats[arg.friend].webContents.send('old-message', newMensaje);
+      chats[arg.friend].webContents.send('chat message', {message:newMensaje});
       mensajes.push(newMensaje);
     }
   }

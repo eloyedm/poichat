@@ -57,11 +57,11 @@
           game.keyup(keycode);
         });
 
-        $(window).on('accelerate', function(data){
-          renderer.send('accelerate', data)
+        $(document).on('accelerate', function(){
+          renderer.send('accelerateGame', null);
         })
 
-        renderer.on('accelerate', (event, arg) => {
+        renderer.on('accelerateGame', (event, arg) => {
           game.addVel();
         })
       });

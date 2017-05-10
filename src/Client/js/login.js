@@ -81,7 +81,7 @@ $(document).ready(function(){
       },
       success: function(data){
         alert("Bienvenido "+ data.user);
-        renderer.send('succeedLogin',{name:data.user, token:data.token});
+        renderer.send('succeedLogin',{name:data.user, token:data.token, secret: data.secret});
         seeChats(data);
       },
       error: function(){

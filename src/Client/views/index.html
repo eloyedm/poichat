@@ -232,8 +232,11 @@
       })
 
       renderer.on('old-message', (event, arg) => {
-        console.log(arg)
         handleOldMessage(arg)
+      })
+
+      renderer.on('save-before-close', (event, arg) =>{
+        renderer.send('save-before-close', {messages: handleSaveMessages()});
       })
       //
       // socket.on('notHere', function(data){
@@ -466,7 +469,16 @@
           html: message
         });
 
-        $("#messages #old").append(newMessage);
+        $("#messages #new").append(newMessage);
+      }
+
+      function handleSaveMessages(){
+        var messages = [];
+        $("#new li").each(function(){
+          messages.push(this.textContent);
+        })
+
+        return messages;
       }
 
       function makeid()

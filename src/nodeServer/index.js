@@ -18,7 +18,7 @@ var mysql = require('mysql');
 var dbConnection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : 'diaz.1913',
+  password : '',
   database : 'senses'
 });
 
@@ -90,12 +90,12 @@ app.get('/receive/:type/:file/:token', function(req, res){
 
 app.post('/login', function(req, res){
   //authentication with te db
-  check(req.body.nameUser, req.body.pass, function(valid, status){
+  check(req.body.nameUser, req.body.pass, function(valid, profile){
     if(valid){
       dbConnection.query('SELECT username, status FROM user WHERE username != ? AND status != 4', [req.body.nameUser], function(error, results, fields){
         var newToken = randomize();
         dbConnection.query('UPDATE user SET validToken = ? WHERE username = ?', [newToken, req.body.nameUser]);
-        res.json({user: req.body.nameUser, people: results, token: newToken, status: status});
+        res.json({user: req.body.nameUser, people: results, token: newToken, status: profile.status, secret: profile.secret});
       });
     }
     else{
@@ -223,20 +223,14 @@ io.on('connection', function(socket){
     // }
   })
 
-  socket.on('video-frame', function(msg){
-    io.emit('video-frame', msg);
-  })
-
   socket.on('buzz', function(msg){
     var data = validateMessage(msg)
-    console.log(data);
     if(data){
       if(users[data.name]){
-        console.log(data);
         socket.broadcast.to(users[data.name]).emit(
           'buzz', {
             buzz: "pzzzzz",
-            sender: users[socket.name]
+            sender: socket.name
           });
       } else {
         console.log(users[socket.name])
@@ -321,6 +315,14 @@ io.on('connection', function(socket){
       }
     })
   })
+
+  socket.on('store-messages', function(msg){
+    validateToken(socket.name, msg.token, function(result){
+      if(result != null){
+        // getUser(socket.name);
+      }
+    })
+  })
 })
 
 function validateMessage(msg){
@@ -359,7 +361,7 @@ function registerUser(name, password, email, callback){
 
 function check(name, password, callback){
   var parameters = [name, password]
-  return dbConnection.query('SELECT username, status FROM user WHERE username = ? AND password = ?', parameters, function(error, results, fields){
+  return dbConnection.query('SELECT username, status, secret FROM user WHERE username = ? AND password = ?', parameters, function(error, results, fields){
     if(results.length == 0)
     {
       callback(false)
@@ -367,7 +369,7 @@ function check(name, password, callback){
     else{
       console.log("si entro")
       setOnline(name);
-      callback(true, results[0].status)
+      callback(true, results[0])
     }
   })
 }
@@ -421,6 +423,10 @@ function validateToken(name, token, callback){
     }
   });
 }
+
+// function getUser(name){
+//   dbConnection.query('SELECT idUser FROM user WHERE username = ?', [name], )
+// }
 // webRTC.rtc.on('chat_msg', (data, socket) => {
 //   var roomList = webRTC.rtc.rooms[data.room] || [];
 //   for(var i = 0; i < roomList.length; i++){

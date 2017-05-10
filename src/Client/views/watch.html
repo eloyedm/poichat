@@ -63,13 +63,16 @@
       socket.emit('getOldMessages', arg);
     })
 
+    renderer.on('store-messages', (event, arg) => {
+      socket.emit('store-messages', arg)
+    })
+
     socket.on('chat message', function(msg){
       console.log("si llega al watch")
       renderer.send('chat message-r', msg)
     })
 
-    socket.on("buzz-r", function(data){
-      console.log(data)
+    socket.on("buzz", function(data){
       renderer.send('buzz-r', data)
     })
 
