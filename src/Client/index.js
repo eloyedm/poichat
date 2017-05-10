@@ -50,13 +50,10 @@ var JsonFormatter = { stringify: function (cipherParams) {
 
 function createWindow() {
   console.log(__dirname + '/resources/img/graph-icon.png');
-  win = new BrowserWindow({width: 800, height: 600});
-  win.loadURL('file://' + __dirname + '/views/login.html');
   var imageN = nativeImage.createFromPath(__dirname + '/resources/img/Accept-icon.png');
+  win = new BrowserWindow({width: 200, height: 150, icon: imageN});
 
-  const image = clipboard.readImage()
-  const appIcon = new Tray(image)
-  win.setIcon(imageN)
+  win.loadURL('file://' + __dirname + '/views/login.html');
   // win.webContents.openDevTools();
 
   win.on('closed', () =>{
@@ -97,7 +94,7 @@ ipcMain.on('new-chat', (event, arg) => {
   currentUser = arg.user
   if(friends.indexOf(arg.friend) == -1){
     friends.push(arg.friend)
-    var newChat = new BrowserWindow({width: 800, height: 600});
+    var newChat = new BrowserWindow({width: 400, height: 300});
     newChat.loadURL('file://'+__dirname+'/views/index.html');
     newChat.webContents.openDevTools();
     // newChat.on('close', () => {
@@ -196,16 +193,20 @@ ipcMain.on('acceptGame', (event, arg) => {
 })
 
 ipcMain.on('save-before-close', (event, arg) =>{
-  console.log(arg);
   var mensajesSt = []
   if(arg.messages.length > 0){
     for (message of arg.messages) {
       mensaje = CryptoJS.AES.encrypt(message, secret);
       mensaje = CryptoJS.enc.Utf8.parse(mensaje);
-      mensajesSt.push(mensaje)
+      mensajesSt.push(JSON.stringify(mensaje))
     }
-    watchWindow.webContents.send('store-messages', {messages: mensajesSt, token: token});
+    watchWindow.webContents.send('store-messages', {messages: mensajesSt, token: token, friend: arg.friend});
   }
+})
+
+ipcMain.on('recoverMessages', (event, arg) =>{
+  arg.token = token;
+  watchWindow.webContents.send('recoverMessages', arg)
 })
 
 ipcMain.on('chat message-r', (event, arg) => {
@@ -294,6 +295,17 @@ ipcMain.on('acceptGame-r', (event, arg) => {
       chats[arg.sender].webContents.send('not', {message: 'El usuario no acepto tu solicitud'});
     }
   }
+})
+
+ipcMain.on('recoverMessages-r', (event, arg) => {
+  for (mesasage of arg.messages) {
+    var oldMessage = JSON.parse(message.message);
+    var words = CryptoJS.enc.Utf8.stringify(oldMessage);
+    oldMessage = CryptoJS.AES.decrypt(words, secret)
+    var utf8 = arg.message.toString(CryptoJS.enc.Utf8)
+    oldMessage = utf8
+  }
+  // chats[arg.friend].webContents.send('recoverMessages', arg)
 })
 // var conn = new WebSocket('ws://localhost:8080');
 // conn.onopen = function(e) {

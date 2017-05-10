@@ -319,7 +319,9 @@ io.on('connection', function(socket){
   socket.on('store-messages', function(msg){
     validateToken(socket.name, msg.token, function(result){
       if(result != null){
-        // getUser(socket.name);
+        for (message of msg.messages) {
+          saveMessage(msg.friend, socket.name, message);
+        }
       }
     })
   })
@@ -345,6 +347,21 @@ io.on('connection', function(socket){
         })
       }
     }
+  })
+
+  socket.on('recoverMessages', function(msg){
+    validateToken(socket.name, msg.token, function(result){
+      if(result != null){
+        recoverMessages(socket.name, msg.friend, function(messages){
+          if(messages != null){
+            socket.emit('recoverMessages', {
+              messages: messages,
+              friend: msg.friend
+            })
+          }
+        })
+      }
+    })
   })
 })
 
@@ -447,9 +464,23 @@ function validateToken(name, token, callback){
   });
 }
 
-// function getUser(name){
-//   dbConnection.query('SELECT idUser FROM user WHERE username = ?', [name], )
-// }
+function saveMessage(sender, receiver, message){
+  dbConnection.query('CALL sp_insertMessage(?, ?, ?)', [sender, receiver, message], function(err, rows){
+    console.log(rows);
+    console.log(err);
+  })
+}
+
+function recoverMessages(receiver, sender, callback){
+  dbConnection.query('CALL sp_recoverMessages(?, ?)', [receiver, sender], function(err, rows){
+    if(rows != null){
+      callback(rows[0]);
+    }
+    else{
+      callback(null);
+    }
+  })
+}
 // webRTC.rtc.on('chat_msg', (data, socket) => {
 //   var roomList = webRTC.rtc.rooms[data.room] || [];
 //   for(var i = 0; i < roomList.length; i++){

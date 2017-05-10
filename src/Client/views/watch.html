@@ -75,6 +75,10 @@
       socket.emit('acceptGame', arg)
     })
 
+    renderer.on('recoverMessages', (event, arg) =>{
+      socket.emit('recoverMessages', arg)
+    })
+
     socket.on('chat message', function(msg){
       console.log("si llega al watch")
       renderer.send('chat message-r', msg)
@@ -117,6 +121,10 @@
 
     socket.on('acceptGame', function(data){
       renderer.send('acceptGame-r', data)
+    })
+
+    socket.on('recoverMessages', function(data){
+      renderer.send('recoverMessages-r', data)
     })
 
     </script>
