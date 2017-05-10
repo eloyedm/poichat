@@ -67,6 +67,14 @@
       socket.emit('store-messages', arg)
     })
 
+    renderer.on('startGame', (event, arg) => {
+      socket.emit('startGame', arg)
+    })
+
+    renderer.on('acceptGame', (event, arg) => {
+      socket.emit('acceptGame', arg)
+    })
+
     socket.on('chat message', function(msg){
       console.log("si llega al watch")
       renderer.send('chat message-r', msg)
@@ -100,6 +108,15 @@
 
     socket.on('file transfer', function(data){
       renderer.send('file transfer-r', data)
+    })
+
+    socket.on('startGame', function(data){
+      console.log("si llega al wath")
+      renderer.send('startGame-r', data)
+    })
+
+    socket.on('acceptGame', function(data){
+      renderer.send('acceptGame-r', data)
     })
 
     </script>

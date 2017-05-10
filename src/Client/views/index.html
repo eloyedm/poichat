@@ -206,14 +206,12 @@
         $("#buzzSound").trigger('play')
       })
 
-
       renderer.on('offer', (event, arg) => {
-      // socket.on('offer', function(data){
+
         handleOffer(arg.offer, arg.name)
       })
 
       renderer.on('answer', (event, arg) => {
-      // socket.on('answer', function(data){
         handleAnswer(arg.answer)
       })
 
@@ -222,7 +220,6 @@
       })
 
       renderer.on('candidate', (event, arg) => {
-      // socket.on('candidate', function(data){
         console.log("si llega el candidate")
         handleCandidate(JSON.parse(arg.candidate))
       })
@@ -238,6 +235,15 @@
       renderer.on('save-before-close', (event, arg) =>{
         renderer.send('save-before-close', {messages: handleSaveMessages()});
       })
+
+      renderer.on('startGame', (event, arg)=>{
+        if(confirm('Deseas aceptar la solicitud de juego?')){
+          renderer.send('acceptGame', {friend: friend, answer: true})
+        }else{
+          renderer.send('acceptGame', {friend: friend, answer: false})
+        }
+      })
+
       //
       // socket.on('notHere', function(data){
       //   alert(data.error)
@@ -329,7 +335,6 @@
       })
 
       $('#StartGame .fa-gamepad').click(function(){
-        console.log("si entra");
         renderer.send('startGame', {friend: friend});
         // $('body#chat>div.content>div[class^="mensajes"]').toggleClass("mensajes mensajes-min");
         // $('div#Starfield').addClass('start');

@@ -179,24 +179,33 @@ ipcMain.on('statusChange', (event, arg) => {
 })
 
 ipcMain.on('startGame', (event, arg) => {
+  watchWindow.webContents.send('startGame',arg )
+})
 
-  if(friends.indexOf(arg.friend) != -1){
-    var newGame = new BrowserWindow({width: 800, height: 600});
-    newGame.loadURL('file://'+__dirname+'/views/game.html');
-    newGame.webContents.openDevTools();
-    games[arg.friend] = newGame;
+ipcMain.on('acceptGame', (event, arg) => {
+  watchWindow.webContents.send('acceptGame',arg )
+  if(arg.answer == true){
+    if(friends.indexOf(arg.friend) != -1){
+      var newGame = new BrowserWindow({width: 800, height: 600});
+      newGame.loadURL('file://'+__dirname+'/views/game.html');
+      newGame.webContents.openDevTools();
+      newGame.friend = arg.friend
+      games[arg.friend] = newGame;
+    }
   }
 })
 
 ipcMain.on('save-before-close', (event, arg) =>{
   console.log(arg);
-  var mensajes = []
-  for (message of arg.messages) {
-    mensaje = CryptoJS.AES.encrypt(message, secret);
-    mensaje = CryptoJS.enc.Utf8.parse(mensaje);
-    mensajes.push(mensaje)
+  var mensajesSt = []
+  if(arg.messages.length > 0){
+    for (message of arg.messages) {
+      mensaje = CryptoJS.AES.encrypt(message, secret);
+      mensaje = CryptoJS.enc.Utf8.parse(mensaje);
+      mensajesSt.push(mensaje)
+    }
+    watchWindow.webContents.send('store-messages', {messages: mensajesSt, token: token});
   }
-  watchWindow.webContents.send('store-messages', {messages: mensajes, token: token});
 })
 
 ipcMain.on('chat message-r', (event, arg) => {
@@ -262,6 +271,27 @@ ipcMain.on('oldMessages-r', (event, arg) => {
       newMensaje = utf8;
       chats[arg.friend].webContents.send('chat message', {message:newMensaje});
       mensajes.push(newMensaje);
+    }
+  }
+})
+
+ipcMain.on('startGame-r', (event, arg) => {
+  console.log("llego aqui la solicitud")
+  chats[arg.sender].webContents.send('startGame', arg)
+})
+
+ipcMain.on('acceptGame-r', (event, arg) => {
+  if(friends.indexOf(arg.sender) != -1){
+    if(arg.answer == true){
+      var newGame = new BrowserWindow({width: 800, height: 600});
+      newGame.loadURL('file://'+__dirname+'/views/game.html');
+      newGame.webContents.openDevTools();
+      newGame.friend = arg.sender
+      games[arg.sender] = newGame;
+      console.log(arg.sender);
+    }
+    else{
+      chats[arg.sender].webContents.send('not', {message: 'El usuario no acepto tu solicitud'});
     }
   }
 })

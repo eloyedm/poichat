@@ -323,6 +323,29 @@ io.on('connection', function(socket){
       }
     })
   })
+
+  socket.on('startGame', function(msg){
+    console.log(msg)
+    if(msg.friend != ""){
+      if(users[msg.friend]){
+            console.log(users[msg.friend])
+        socket.broadcast.to(users[msg.friend]).emit('startGame', {
+          sender: socket.name
+        })
+      }
+    }
+  })
+
+  socket.on('acceptGame', function(msg){
+    if(msg.friend != ""){
+      if(users[msg.friend]){
+        socket.broadcast.to(users[msg.friend]).emit('acceptGame', {
+          sender: socket.name,
+          answer: msg.answer
+        })
+      }
+    }
+  })
 })
 
 function validateMessage(msg){
