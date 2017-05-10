@@ -54,6 +54,25 @@ begin
     where _idUser = idUser;
 end$$
 
+create or replace procedure sp_insertMessage(
+	in _speaker varchar(50),
+    in _recipient varchar(50),
+    in _message text
+)
+begin
+	declare idSpeaker int unsigned;
+    declare idRecipient int unsigned;
+    
+	select idUser into idSpeaker from user where username = _speaker;
+    
+    select idUser into idRecipient from user where username = _recipient;
+    
+    insert into chat set
+		speaker 	= idSpeaker,
+        recipient 	= idRecipient,
+        message 	= _message,
+        sent 		= now();
+end$$
 
 delimiter ;
 
