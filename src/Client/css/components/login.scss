@@ -192,6 +192,30 @@ body#login{
           }
         }
       }
+      >ul.multipleFriendsContainer{
+        display: none;
+        width: 100%;
+        background-color: $color_blue_clear;
+        border-radius: 5px;
+        list-style: none;
+        margin: 0;
+        padding: 10px;
+        box-sizing: border-box;
+        >li.selectable{
+          font: 15px _Gothic_;
+          margin-bottom: 10px;
+          cursor: pointer;
+          &:hover{
+            text-decoration: underline;
+          }
+          &:last-child{
+            margin-bottom: 0;
+          }
+        }
+        >li.selectable.chosen{
+          background-color: rgba(64,64,64, 0.5);
+        }
+      }
     }
   }
 }

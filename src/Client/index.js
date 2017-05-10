@@ -51,10 +51,10 @@ var JsonFormatter = { stringify: function (cipherParams) {
 function createWindow() {
   console.log(__dirname + '/resources/img/graph-icon.png');
   var imageN = nativeImage.createFromPath(__dirname + '/resources/img/Accept-icon.png');
-  win = new BrowserWindow({width: 200, height: 150, icon: imageN});
+  win = new BrowserWindow({width: 800, height: 600, icon: imageN});
 
   win.loadURL('file://' + __dirname + '/views/login.html');
-  // win.webContents.openDevTools();
+  win.webContents.openDevTools();
 
   win.on('closed', () =>{
     win = null
@@ -92,9 +92,14 @@ ipcMain.on('watch', (event, arg) =>{
 
 ipcMain.on('new-chat', (event, arg) => {
   currentUser = arg.user
+  if(arg.type == 'group'){
+    var oneFriend = arg.friend.join('.');
+    oneFriend = CryptoJS.SHA256(oneFriend).toString();
+    arg.friend = oneFriend;
+  }
   if(friends.indexOf(arg.friend) == -1){
     friends.push(arg.friend)
-    var newChat = new BrowserWindow({width: 400, height: 300});
+    var newChat = new BrowserWindow({width: 800, height: 600});
     newChat.loadURL('file://'+__dirname+'/views/index.html');
     newChat.webContents.openDevTools();
     // newChat.on('close', () => {
@@ -104,6 +109,7 @@ ipcMain.on('new-chat', (event, arg) => {
     newChat.friend = arg.friend;
     chats[arg.friend] = newChat;
 
+    console.log(friends);
     chats[arg.friend].on('close', (e) =>{
       var d = e.sender.friend;
       chats[d].webContents.send('save-before-close', null);
