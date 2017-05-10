@@ -12,6 +12,7 @@ var CryptoJS = require('crypto-js');
 let win;
 var chats = new Object();
 var games = new Object();
+var groups = new Object();
 var watchWindow = '';
 var currentUser = '';
 var userLine = '';
@@ -96,6 +97,8 @@ ipcMain.on('new-chat', (event, arg) => {
     var oneFriend = arg.friend.join('.');
     oneFriend = CryptoJS.SHA256(oneFriend).toString();
     arg.friend = oneFriend;
+    group[oneFriend] = [];
+    group[oneFriend] = arg.friend;
   }
   if(friends.indexOf(arg.friend) == -1){
     friends.push(arg.friend)
@@ -120,7 +123,11 @@ ipcMain.on('new-chat', (event, arg) => {
 })
 
 ipcMain.on('opened-chat', (event, arg) => {
-  event.sender.send('user-return', friends[friends.length-1])
+  var group = false;
+  if(friends[friends.length-1] == 256 ){
+    group = true;
+  }
+  event.sender.send('user-return', {friend:friends[friends.length-1], group: group})
   watchWindow.webContents.send('getOldMessages', {token: token, friend: friends[friends.length-1]})
   userLine = event.sender
 })
@@ -140,9 +147,12 @@ ipcMain.on('chat message', (event, arg) => {
     tempArg.token = token;
   }
 
+  if(arg.group == true){
+    tempArg.members = groups[tempArg.friend]
+  }
+
   arg = JSON.stringify(tempArg);
   watchWindow.webContents.send('chat message', arg);
-
 
   // var tempChat = event.getPosition()
   // console.log(tempChat)

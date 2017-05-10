@@ -8,6 +8,7 @@ var md5 = require('./node_modules/blueimp-md5/js/md5.min.js')
 var nodemailer = require('nodemailer')
 var CryptoJS = require('crypto-js');
 var pending = {};
+var groups = {};
 
 
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
@@ -18,7 +19,7 @@ var mysql = require('mysql');
 var dbConnection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : '',
+  password : 'homecoming96',
   database : 'senses'
 });
 
@@ -112,19 +113,34 @@ io.on('connection', function(socket){
        data = JSON.parse(msg);
        if(data.name != ""){
          if(users[data.name]){
-           socket.broadcast.to(users[data.name]).emit('chat message', {
-             origin: "other",
-             message: data.message,
-             sender: socket.name,
-             token: data.token,
-             crypting: data.crypting
-           })
-           socket.broadcast.to(users[socket.name]).emit('chat message', {
-             origin: "own",
-             message: data.message,
-             sender: socket.name
-           })
-
+           if(data.group == true){
+             if(!groups[data.friend]){
+               groups[data.friend] = data.member;
+              }
+             for (member of groups[data.members]) {
+               socket.broadcast.to(users[member]).emit('chat message', {
+                 origin: "other",
+                 message: data.message,
+                 sender: data.friend,
+                 token: data.token,
+                 crypting: data.crypting
+               })
+             }
+           }
+           else{
+             socket.broadcast.to(users[data.name]).emit('chat message', {
+               origin: "other",
+               message: data.message,
+               sender: socket.name,
+               token: data.token,
+               crypting: data.crypting
+             })
+             socket.broadcast.to(users[socket.name]).emit('chat message', {
+               origin: "own",
+               message: data.message,
+               sender: socket.name
+             })
+           }
          }
          else{
           //  socket.broadcast.to(users[socket.name]).emit('notHere', {
