@@ -25,6 +25,7 @@ var chatUser = '';
 var friends = new Array();
 var crypting = true;
 let secret = '';
+var waitingMessage;
 
 var JsonFormatter = { stringify: function (cipherParams) {
   var jsonObj = { ct: cipherParams.ciphertext.toString(CryptoJS.enc.Base64) };
@@ -96,9 +97,11 @@ ipcMain.on('new-chat', (event, arg) => {
   if(arg.type == 'group'){
     var oneFriend = arg.friend.join('.');
     oneFriend = CryptoJS.SHA256(oneFriend).toString();
+    groups[oneFriend] = [];
+    groups[oneFriend] = arg.friend;
+    console.log(arg.friend);
     arg.friend = oneFriend;
-    group[oneFriend] = [];
-    group[oneFriend] = arg.friend;
+    console.log(groups)
   }
   if(friends.indexOf(arg.friend) == -1){
     friends.push(arg.friend)
@@ -112,7 +115,6 @@ ipcMain.on('new-chat', (event, arg) => {
     newChat.friend = arg.friend;
     chats[arg.friend] = newChat;
 
-    console.log(friends);
     chats[arg.friend].on('close', (e) =>{
       var d = e.sender.friend;
       chats[d].webContents.send('save-before-close', null);
@@ -124,7 +126,7 @@ ipcMain.on('new-chat', (event, arg) => {
 
 ipcMain.on('opened-chat', (event, arg) => {
   var group = false;
-  if(friends[friends.length-1] == 256 ){
+  if(friends[friends.length-1].length == 64 ){
     group = true;
   }
   event.sender.send('user-return', {friend:friends[friends.length-1], group: group})
@@ -146,11 +148,10 @@ ipcMain.on('chat message', (event, arg) => {
     tempArg.message = mensaje;
     tempArg.token = token;
   }
-
-  if(arg.group == true){
-    tempArg.members = groups[tempArg.friend]
+  if(tempArg.group == true){
+    tempArg.members = groups[tempArg.name]
   }
-
+  console.log(tempArg)
   arg = JSON.stringify(tempArg);
   watchWindow.webContents.send('chat message', arg);
 
@@ -226,18 +227,40 @@ ipcMain.on('recoverMessages', (event, arg) =>{
 })
 
 ipcMain.on('chat message-r', (event, arg) => {
-  if(arg.token != 'undefined'){
-    var tempName = arg.sender;
-    friendsTokens[tempName] = {};
-    friendsTokens[tempName]['token'] = arg.token;
-    friendsTokens[tempName]['crypting'] = arg.crypting
+  if(!friends[arg.sender]){
+    console.log('este vato es nuevo')
+    console.log(arg)
+    if(friends.indexOf(arg.sender) == -1){
+      friends.push(arg.sender)
+      var newChat = new BrowserWindow({width: 800, height: 600});
+      newChat.loadURL('file://'+__dirname+'/views/index.html');
+      newChat.webContents.openDevTools();
+      // newChat.on('close', () => {
+      //
+      // })
+      newChat.started = false;
+      newChat.friend = arg.sender;
+      chats[arg.sender] = newChat;
+      chats[arg.sender].on('close', (e) =>{
+        var d = e.sender.friend;
+        chats[d].webContents.send('save-before-close', null);
+        delete chats[d];
+        delete friends[d];
+      });
+    }
   }
-  friendsTokens[arg.sender]['crypting']
-  if(friendsTokens[arg.sender]['crypting']){
+  // if(arg.token != 'undefined'){
+  //   var tempName = arg.sender;
+  //   friendsTokens[tempName] = {};
+  //   friendsTokens[tempName]['token'] = arg.token;
+  //   friendsTokens[tempName]['crypting'] = arg.crypting
+  // }
+  // friendsTokens[arg.sender]['crypting']
+  if(arg.crypting){
     console.log(arg.message)
     var words = CryptoJS.enc.Utf8.stringify(arg.message);
     console.log(words)
-    arg.message = CryptoJS.AES.decrypt(words, friendsTokens[arg.sender]['token'])
+    arg.message = CryptoJS.AES.decrypt(words, arg.token)
     console.log(arg.message)
     var utf8 = arg.message.toString(CryptoJS.enc.Utf8)
     console.log(utf8)
@@ -281,17 +304,18 @@ ipcMain.on('file transfer-r', (event, arg) => {
 })
 
 ipcMain.on('oldMessages-r', (event, arg) => {
-  var mensajes = [];
-  console.log(arg.friend);
-  for (message of arg.messages) {
-    if(message.crypting == true){
-      var newMensaje;
-      var words = CryptoJS.enc.Utf8.stringify(message.message);
-      newMensaje = CryptoJS.AES.decrypt(words, message['token']);
-      var utf8 = newMensaje.toString(CryptoJS.enc.Utf8);
-      newMensaje = utf8;
-      chats[arg.friend].webContents.send('chat message', {message:newMensaje});
-      mensajes.push(newMensaje);
+  if(arg.messages != null){
+    var mensajes = [];
+    for (message of arg.messages) {
+      if(message.crypting == true){
+        var newMensaje;
+        var words = CryptoJS.enc.Utf8.stringify(message.message);
+        newMensaje = CryptoJS.AES.decrypt(words, message['token']);
+        var utf8 = newMensaje.toString(CryptoJS.enc.Utf8);
+        newMensaje = utf8;
+        chats[arg.friend].webContents.send('chat message', {message:newMensaje});
+        mensajes.push(newMensaje);
+      }
     }
   }
 })

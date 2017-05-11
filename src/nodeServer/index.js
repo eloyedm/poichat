@@ -19,7 +19,7 @@ var mysql = require('mysql');
 var dbConnection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : 'homecoming96',
+  password : '',
   database : 'senses'
 });
 
@@ -112,49 +112,59 @@ io.on('connection', function(socket){
     try {
        data = JSON.parse(msg);
        if(data.name != ""){
-         console.log(data.name)
-         console.log(users)
-         if(users[data.name]){
-           console.log(data)
-           if(data.group == true){
-             if(!groups[data.friend]){
-               groups[data.friend] = data.member;
-              }
-             for (member of groups[data.members]) {
+         console.log(data)
+         if(data.group == true){
+           console.log('sies grupal')
+           if(!groups[data.name]){
+             data.members.push(socket.name);
+             groups[data.name] = data.members;
+            }
+            console.log(groups);
+            console.log(groups[data.name])
+           for (member of groups[data.name]) {
+             if(member != socket.name){
                socket.broadcast.to(users[member]).emit('chat message', {
                  origin: "other",
                  message: data.message,
-                 sender: data.friend,
+                 sender: data.name,
                  token: data.token,
-                 crypting: data.crypting
+                 crypting: data.crypting,
+                 group: true
                })
              }
-           }
-           else{
-             console.log(data)
-             socket.broadcast.to(users[data.name]).emit('chat message', {
-               origin: "other",
-               message: data.message,
-               sender: socket.name,
-               token: data.token,
-               crypting: data.crypting
-             })
-             socket.broadcast.to(users[socket.name]).emit('chat message', {
-               origin: "own",
-               message: data.message,
-               sender: socket.name
-             })
+
+             console.log('enviado a estos weyes')
            }
          }
          else{
-          //  socket.broadcast.to(users[socket.name]).emit('notHere', {
-          //     error: "No es posible entregar el mensaje en este momento"
-          //  })
-            if(!pending[data.name]){
-              pending[data.name] = {};
+          if(users[data.name]){
+           socket.broadcast.to(users[data.name]).emit('chat message', {
+             origin: "other",
+             message: data.message,
+             sender: socket.name,
+             token: data.token,
+             crypting: data.crypting,
+             group: false
+           })
+           socket.broadcast.to(users[socket.name]).emit('chat message', {
+             origin: "own",
+             message: data.message,
+             sender: socket.name
+           })
             }
-            pending[data.name] = checkForPreviousMessages(pending[data.name], socket.name, data);
+           else{
+            //  socket.broadcast.to(users[socket.name]).emit('notHere', {
+            //     error: "No es posible entregar el mensaje en este momento"
+            //  })
+              if(!pending[data.name]){
+                pending[data.name] = {};
+              }
+              pending[data.name] = checkForPreviousMessages(pending[data.name], socket.name, data);
+           }
          }
+
+
+
        }
        else{
          io.emit('chat message',{
@@ -162,11 +172,9 @@ io.on('connection', function(socket){
            message: data.message
          });
        }
-       console.log(users[socket.name])
     } catch (e) {
        data = {};
     }
-    console.log(pending);
   });
 
   socket.on('login', function(msg){
@@ -296,7 +304,6 @@ io.on('connection', function(socket){
 
   delivery.on('receive.success', function(file, extra){
     var params = file.params;
-    console.log(file.params);
     fs.writeFile("images/"+file.name, file.buffer, function(err){
       if(err){
         console.log('File could not be saved');
@@ -310,13 +317,11 @@ io.on('connection', function(socket){
   });
 
   socket.on('getOldMessages', function(msg){
-    console.log(users[socket.name])
     validateToken(socket.name, msg.token, function(result){
       if(result != null){
         if(pending[socket.name] != undefined ){
-          console.log(socket.name)
+          console.log(pending);
           if(pending[socket.name][msg.friend] != undefined){
-            console.log('hay mensajes');
             socket.emit('getOldMessages', {
               messages: pending[socket.name][msg.friend],
               friend: msg.friend,
@@ -413,8 +418,7 @@ function registerUser(name, password, email, callback){
       throw error
     }
     else{
-      console.log("ya se inserto, sigue el mail")
-    callback(true,email, name);
+      callback(true,email, name);
     }
   })
 }
@@ -427,7 +431,6 @@ function check(name, password, callback){
       callback(false)
     }
     else{
-      console.log("si entro")
       setOnline(name);
       callback(true, results[0])
     }
@@ -451,7 +454,6 @@ function getAvailableUsers(name){
       throw error
     }
     else{
-      console.log(results);
       return results
     }
   })
@@ -461,7 +463,6 @@ function getAvailableUsers(name){
 function randomize(crypt) {
     crypt= typeof crypt !== 'undefined' ? crypt : false;
     var startString =  Math.random().toString(36).substr(2); // remove `0.`
-    console.log(startString);
     if(crypt == true){
       return md5(startString);
     }else{
