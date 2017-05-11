@@ -74,10 +74,12 @@
       const remote = require("electron").remote
       var window = remote.getCurrentWindow()
       var friend;
+      var group = false;
       renderer.send('opened-chat', 'ok');
       renderer.on('user-return', (event, arg) => {
         console.log(arg)
-        friend = arg
+        friend = arg.friend;
+        group = arg.group
       })
       //
       var serverDirection = "http://localhost:8001";
@@ -268,10 +270,11 @@
         // ipcRenderer.send('response-message', $('#m').val());
         event.preventDefault();
         var msgToSend = $('#m').val();
-
+      
         var msg = {
           name: friend,
-          message: msgToSend
+          message: msgToSend,
+          group: group
         }
         renderer.send('chat message', JSON.stringify(msg))
 
@@ -417,6 +420,8 @@
         if(confirm("Deseas aceptar la llamada de "+ friend+"?")){
           handleLogin('ok',function(){
             console.log("y finalmente esto");
+            $('body#chat>div.content>div[class^="video"]').toggleClass('video video-min');
+            $('body#chat>div.content>div[class^="mensajes"]').toggleClass('mensajes mensajes-min');
             yourConn.setRemoteDescription(new RTCSessionDescription(offer));
             yourConn.createAnswer(function(answer){
             console.log(offer);

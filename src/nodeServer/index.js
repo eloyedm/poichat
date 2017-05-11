@@ -112,7 +112,10 @@ io.on('connection', function(socket){
     try {
        data = JSON.parse(msg);
        if(data.name != ""){
+         console.log(data.name)
+         console.log(users)
          if(users[data.name]){
+           console.log(data)
            if(data.group == true){
              if(!groups[data.friend]){
                groups[data.friend] = data.member;
@@ -128,6 +131,7 @@ io.on('connection', function(socket){
              }
            }
            else{
+             console.log(data)
              socket.broadcast.to(users[data.name]).emit('chat message', {
                origin: "other",
                message: data.message,
