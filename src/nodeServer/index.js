@@ -388,6 +388,16 @@ io.on('connection', function(socket){
       }
     })
   })
+
+  socket.on('accelerateGame', function(msg){
+    if(msg.friend != ""){
+      if(users[msg.friend]){
+        socket.broadcast.to(users[msg.friend]).emit('accelerateGame', {
+          sender: socket.name
+        })
+      }
+    }
+  })
 })
 
 function validateMessage(msg){

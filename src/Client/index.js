@@ -53,7 +53,7 @@ var JsonFormatter = { stringify: function (cipherParams) {
 function createWindow() {
   console.log(__dirname + '/resources/img/graph-icon.png');
   var imageN = nativeImage.createFromPath(__dirname + '/resources/img/Accept-icon.png');
-  win = new BrowserWindow({width: 800, height: 600, icon: imageN});
+  win = new BrowserWindow({width: 400, height: 300, icon: imageN});
 
   win.loadURL('file://' + __dirname + '/views/login.html');
   win.webContents.openDevTools();
@@ -105,7 +105,7 @@ ipcMain.on('new-chat', (event, arg) => {
   }
   if(friends.indexOf(arg.friend) == -1){
     friends.push(arg.friend)
-    var newChat = new BrowserWindow({width: 800, height: 600});
+    var newChat = new BrowserWindow({width: 400, height: 300});
     newChat.loadURL('file://'+__dirname+'/views/index.html');
     newChat.webContents.openDevTools();
     // newChat.on('close', () => {
@@ -132,6 +132,10 @@ ipcMain.on('opened-chat', (event, arg) => {
   event.sender.send('user-return', {friend:friends[friends.length-1], group: group})
   watchWindow.webContents.send('getOldMessages', {token: token, friend: friends[friends.length-1]})
   userLine = event.sender
+})
+
+ipcMain.on('opened-game', (event, arg) => {
+  event.sender.send('game-return', {friend: games[games.length-1]})
 })
 
 ipcMain.on('chat message', (event, arg) => {
@@ -224,6 +228,10 @@ ipcMain.on('save-before-close', (event, arg) =>{
 ipcMain.on('recoverMessages', (event, arg) =>{
   arg.token = token;
   watchWindow.webContents.send('recoverMessages', arg)
+})
+
+ipcMain.on('accelerateGame', (event, arg) =>{
+  watchWindow.webContents.send('accelerateGame', arg)
 })
 
 ipcMain.on('chat message-r', (event, arg) => {
@@ -357,6 +365,11 @@ ipcMain.on('recoverMessages-r', (event, arg) => {
   }
   // chats[arg.friend].webContents.send('recoverMessages', arg)
 })
+
+ipcMain.on('accelerateGame-r', (event, arg) =>{
+  games[arg.sender].webContents.send('accelerateGame', arg)
+})
+
 // var conn = new WebSocket('ws://localhost:8080');
 // conn.onopen = function(e) {
 //     console.log("Connection established!");

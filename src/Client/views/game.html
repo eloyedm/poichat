@@ -34,6 +34,15 @@
     <script type="text/javascript">
       var $ = global.jQuery = require('./../node_modules/jquery/dist/jquery.js');
       const renderer = require('electron').ipcRenderer;
+      var friend;
+      var group = false;
+      
+      renderer.send('opened-game', 'ok');
+
+      renderer.on('game-return', (event, arg) => {
+        friend = arg.friend;
+      });
+
       $(document).ready(function(){
         var container = $('div#Starfield').get(0);
         var starfield = new Starfield();
@@ -58,7 +67,11 @@
         });
 
         $(document).on('accelerate', function(){
-          renderer.send('accelerateGame', null);
+          var msg = {
+            friend: friend,
+            accel: true
+          };
+          renderer.send('accelerateGame', msg);
         })
 
         renderer.on('accelerateGame', (event, arg) => {

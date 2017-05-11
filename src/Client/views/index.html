@@ -185,6 +185,10 @@
                             tauri:{title:"Tauri",codes:["(tauri)"]},
                             priidu:{title:"Priidu",codes:["(priidu)"]}};
       emoticons.define(definition);
+
+      if(group == true){
+        $(".call").remove();
+      }
       // var rtc = require('webrtc.io-client');
       // console.log(rtc);
       // ipcRenderer.on('new-message', (event, arg) => {
@@ -270,7 +274,7 @@
         // ipcRenderer.send('response-message', $('#m').val());
         event.preventDefault();
         var msgToSend = $('#m').val();
-      
+
         var msg = {
           name: friend,
           message: msgToSend,
