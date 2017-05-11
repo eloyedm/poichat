@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "electron .",
+    "pack": "electron-packager"
   },
   "author": "Eloy Diaz",
   "license": "ISC",
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "electron": "^1.4.15",
+    "electron-packager": "^8.7.0",
     "font-awesome": "^4.7.0"
   }
 }

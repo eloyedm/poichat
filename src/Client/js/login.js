@@ -6,6 +6,7 @@ var window = remote.getCurrentWindow()
 var md5 = require('./../node_modules/blueimp-md5/js/md5.min.js')
 var serverAddress = "http://localhost:8001"
 
+
 function chatWindow(){
   this.userName = '';
   this.selectedFriend = [];

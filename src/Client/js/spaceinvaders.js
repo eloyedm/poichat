@@ -288,6 +288,30 @@ GameOverState.prototype.keydown = function(game, keyCode) {
   }
 };
 
+function YouWinState() {}
+YouWinState.prototype.update = function(game, dt) {};
+YouWinState.prototype.draw = function(game, dt, ctx) {
+  ctx.clearRect(0, 0, game.width, game.height);
+
+  ctx.font="30px Century Gothic";
+  ctx.fillStyle = '#ffffff';
+  ctx.textBaseline="center";
+  ctx.textAlign="center";
+  ctx.fillText("YOU WIN!", game.width / 2, game.height/2 - 40);
+  ctx.font="16px Century Gothic";
+  ctx.fillText("You scored " + game.score, game.width / 2, game.height/2);
+  ctx.font="16px Century Gothic";
+  ctx.fillText("Press 'Space' to go to menu.", game.width / 2, game.height/2 + 40);
+};
+YouWinState.prototype.keydown = function(game, keyCode) {
+  if(keyCode == 32){
+    game.lives = 3;
+    game.score = 0;
+    game.level = 1;
+    game.moveToState(new WelcomeState());
+  }
+};
+
 function PlayState(config, level) {
   this.config = config;
   this.level = level;
@@ -487,8 +511,7 @@ PlayState.prototype.update = function(game, dt) {
 
   if(this.invaders.length === 0) {
     game.score += this.level * 50;
-    game.level += 1;
-    game.moveToState(new LevelIntroState(game.level));
+    game.moveToState(new YouWinState());
   }
 };
 PlayState.prototype.draw = function(game, dt, ctx) {
