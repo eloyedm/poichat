@@ -19,7 +19,7 @@ var mysql = require('mysql');
 var dbConnection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : '',
+  password : 'diaz.1913',
   database : 'senses'
 });
 
@@ -38,6 +38,11 @@ var mailOptions = {
   text: "Thanks for joining to senseswe hope you have a good time with us",
   to: ''
 };
+
+getBadges('eloy.edm', function(results){
+  console.log(results);
+});
+console.log('depues esto');
 
 //dbConnection.connect("");
 
@@ -96,7 +101,9 @@ app.post('/login', function(req, res){
       dbConnection.query('SELECT username, status FROM user WHERE username != ? AND status != 4', [req.body.nameUser], function(error, results, fields){
         var newToken = randomize();
         dbConnection.query('UPDATE user SET validToken = ? WHERE username = ?', [newToken, req.body.nameUser]);
-        res.json({user: req.body.nameUser, people: results, token: newToken, status: profile.status, secret: profile.secret});
+        getBadges(req.body.nameUser, function(badges){
+          res.json({user: req.body.nameUser, people: results, badges: badges[0], token: newToken, status: profile.status, secret: profile.secret});
+        })
       });
     }
     else{
@@ -395,6 +402,8 @@ io.on('connection', function(socket){
         socket.broadcast.to(users[msg.friend]).emit('accelerateGame', {
           sender: socket.name
         })
+
+        addPoint(socket.name);
       }
     }
   })
@@ -510,6 +519,24 @@ function recoverMessages(receiver, sender, callback){
     else{
       callback(null);
     }
+  })
+}
+
+function addPoint(player){
+  dbConnection.query('UPDATE user SET points = points+1 WHERE username = ?', [player], function(error, results, fields){
+    console.log(results);
+  })
+}
+
+function saveWin(plauyer){
+  dbConnection.query('UPDATE user SET record = record+1 WHERE username = ?', [player], function(error, results, fields){
+    console.log(results);
+  })
+}
+
+function getBadges(player, callback){
+  var query = dbConnection.query('CALL getBadges(?)', [player], function(erro, results, fields){
+    callback(results);
   })
 }
 // webRTC.rtc.on('chat_msg', (data, socket) => {
