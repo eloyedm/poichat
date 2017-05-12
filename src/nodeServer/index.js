@@ -114,15 +114,11 @@ io.on('connection', function(socket){
     try {
        data = JSON.parse(msg);
        if(data.name != ""){
-         console.log(data)
          if(data.group == true){
-           console.log('sies grupal')
            if(!groups[data.name]){
              data.members.push(socket.name);
              groups[data.name] = data.members;
             }
-            console.log(groups);
-            console.log(groups[data.name])
            for (member of groups[data.name]) {
              if(member != socket.name){
                socket.broadcast.to(users[member]).emit('chat message', {
@@ -134,8 +130,6 @@ io.on('connection', function(socket){
                  group: true
                })
              }
-
-             console.log('enviado a estos weyes')
            }
          }
          else{
@@ -226,7 +220,7 @@ io.on('connection', function(socket){
 
   socket.on('leave', function(msg){
     var data = validateMessage(msg)
-    console.log("este wey se fue");
+    // console.log("este wey se fue");
     if(data){
       var conn = users[data.name]
       socket.broadcast.to(users[data.name]).emit('leave', {
@@ -239,9 +233,9 @@ io.on('connection', function(socket){
     var data = validateMessage(msg)
     // if(data){
       var conn = users[msg.name]
-      console.log("candidate enviado de "+ socket.name+ " a "+ msg.name);
+      // console.log("candidate enviado de "+ socket.name+ " a "+ msg.name);
       if(conn != null){
-        console.log(msg.sender)
+        // console.log(msg.sender)
         socket.broadcast.to(users[msg.name]).emit(
           'candidate', {
           candidate: msg.candidate,
@@ -264,7 +258,7 @@ io.on('connection', function(socket){
             sender: socket.name
           });
       } else {
-        console.log(users[socket.name])
+        // console.log(users[socket.name])
         socket.broadcast.to(users[socket.name]).emit('notHere', {
           error: "No es posible realizar el zumbido en este momento"
         })
@@ -323,7 +317,7 @@ io.on('connection', function(socket){
     validateToken(socket.name, msg.token, function(result){
       if(result != null){
         if(pending[socket.name] != undefined ){
-          console.log(pending);
+          // console.log(pending);
           if(pending[socket.name][msg.friend] != undefined){
             socket.emit('getOldMessages', {
               messages: pending[socket.name][msg.friend],
@@ -357,7 +351,7 @@ io.on('connection', function(socket){
   socket.on('startGame', function(msg){
     if(msg.friend != ""){
       if(users[msg.friend]){
-            console.log(users[msg.friend])
+            // console.log(users[msg.friend])
         socket.broadcast.to(users[msg.friend]).emit('startGame', {
           sender: socket.name
         })
@@ -406,10 +400,8 @@ io.on('connection', function(socket){
   socket.on('gameover', function(msg){
     console.log("ya perdiste"+ socket.name);
     if(msg.friend != ""){
-      console.log("llego al server el gameover");
-      console.log(msg);
       if(users[msg.friend]){
-        console.log(users[msg.friend])
+        // console.log(users[msg.friend])
         socket.broadcast.to(users[msg.friend]).emit('gameover', {
           sender: socket.name
         })

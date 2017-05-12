@@ -211,7 +211,7 @@
       })
 
       renderer.on('buzz', (event, arg) => {
-        console.log("si llega")
+        // console.log("si llega")
         $("#buzzSound").trigger('play')
       })
 
@@ -229,7 +229,7 @@
       })
 
       renderer.on('candidate', (event, arg) => {
-        console.log("si llega el candidate")
+        // console.log("si llega el candidate")
         handleCandidate(JSON.parse(arg.candidate))
       })
 
@@ -345,8 +345,6 @@
       })
 
       $("#hangUp").click(function(){
-        console.log("si le picas");
-        console.log($("#pantalla").src);
         if($("#pantalla").attr("src") != undefined){
           console.log("ahi nos vidrios")
           renderer.send('leave', JSON.stringify({name: friend}));
@@ -426,12 +424,12 @@
         connectedUser = name;
         if(confirm("Deseas aceptar la llamada de "+ friend+"?")){
           handleLogin('ok',function(){
-            console.log("y finalmente esto");
+            // console.log("y finalmente esto");
             $('body#chat>div.content>div[class^="video"]').toggleClass('video video-min');
             $('body#chat>div.content>div[class^="mensajes"]').toggleClass('mensajes mensajes-min');
             yourConn.setRemoteDescription(new RTCSessionDescription(offer));
             yourConn.createAnswer(function(answer){
-            console.log(offer);
+            // console.log(offer);
             yourConn.setLocalDescription(answer)
                 var newAnswer = {'name': friend, 'answer': answer, 'sender': friend};
                 renderer.send('answer', JSON.stringify(newAnswer))

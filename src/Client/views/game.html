@@ -67,7 +67,6 @@
         });
 
         $(document).on('accelerate', function(){
-          console.log('si sale el evento');
           var msg = {
             friend: friend,
             accel: true
@@ -81,12 +80,10 @@
             friend: friend,
             over: true
           };
-          console.log(msg);
           renderer.send('gameover', msg);
         });
 
         renderer.on('gameover', (event, arg)=>{
-          console.log("ya ganeee");
           game.moveToState(new YouWinState());
         })
 

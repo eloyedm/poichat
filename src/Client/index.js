@@ -54,7 +54,7 @@ var JsonFormatter = { stringify: function (cipherParams) {
 function createWindow() {
   console.log(__dirname + '/resources/img/graph-icon.png');
   var imageN = nativeImage.createFromPath(__dirname + '/resources/img/Accept-icon.png');
-  win = new BrowserWindow({width: 400, height: 300, icon: imageN, title: 'Senses'});
+  win = new BrowserWindow({width: 1000, height: 800, icon: imageN, title: 'Senses', resizable: false});
 
   win.loadURL('file://' + __dirname + '/views/login.html');
   win.webContents.openDevTools();
@@ -106,7 +106,7 @@ ipcMain.on('new-chat', (event, arg) => {
   }
   if(friends.indexOf(arg.friend) == -1){
     friends.push(arg.friend)
-    var newChat = new BrowserWindow({width: 400, height: 300, title: arg.friend});
+    var newChat = new BrowserWindow({width: 900, height: 700, title: arg.friend});
     newChat.loadURL('file://'+__dirname+'/views/index.html');
     newChat.webContents.openDevTools();
     // newChat.on('close', () => {
@@ -242,19 +242,19 @@ ipcMain.on('accelerateGame', (event, arg) =>{
 })
 
 ipcMain.on('gameover', (event, arg) =>{
-  console.log("si sale del cliente el gameover")
+  // console.log("si sale del cliente el gameover")
   watchWindow.webContents.send('gameover', arg)
 })
 
 ipcMain.on('chat message-r', (event, arg) => {
   if(!friends[arg.sender]){
-    console.log('este vato es nuevo')
-    console.log(arg)
+    // console.log('este vato es nuevo')
+    // console.log(arg)
     if(friends.indexOf(arg.sender) == -1){
       friends.push(arg.sender)
-      var newChat = new BrowserWindow({width: 800, height: 600, title: arg.sender});
+      var newChat = new BrowserWindow({width: 900, height: 700, title: arg.sender});
       newChat.loadURL('file://'+__dirname+'/views/index.html');
-      newChat.webContents.openDevTools();
+      // newChat.webContents.openDevTools();
       // newChat.on('close', () => {
       //
       // })
@@ -346,7 +346,7 @@ ipcMain.on('oldMessages-r', (event, arg) => {
 })
 
 ipcMain.on('startGame-r', (event, arg) => {
-  console.log("llego aqui la solicitud")
+  // console.log("llego aqui la solicitud")
   chats[arg.sender].webContents.send('startGame', arg)
 })
 
@@ -355,11 +355,11 @@ ipcMain.on('acceptGame-r', (event, arg) => {
     if(arg.answer == true){
       var newGame = new BrowserWindow({width: 800, height: 600, title: 'Invaderz'});
       newGame.loadURL('file://'+__dirname+'/views/game.html');
-      newGame.webContents.openDevTools();
+      // newGame.webContents.openDevTools();
       newGame.friend = arg.sender
       rivals.push(arg.sender);
       games[arg.sender] = newGame;
-      console.log(arg.sender);
+      // console.log(arg.sender);
     }
     else{
       chats[arg.sender].webContents.send('not', {message: 'El usuario no acepto tu solicitud'});
@@ -368,29 +368,29 @@ ipcMain.on('acceptGame-r', (event, arg) => {
 })
 
 ipcMain.on('recoverMessages-r', (event, arg) => {
-  console.log(arg.messages);
+  // console.log(arg.messages);
   for (indMensaje of arg.messages) {
     var oldMessage = JSON.parse(indMensaje.message);
-    console.log(oldMessage)
+    // console.log(oldMessage)
     var words = CryptoJS.enc.Utf8.stringify(oldMessage);
-    console.log(words)
+    // console.log(words)
     oldMessage = CryptoJS.AES.decrypt(words, secret)
-    console.log(oldMessage)
+    // console.log(oldMessage)
     var utf8 = oldMessage.toString(CryptoJS.enc.Utf8)
     oldMessage = utf8;
-    console.log(oldMessage)
+    // console.log(oldMessage)
     chats[arg.friend].webContents.send('recoverMessages', {message: oldMessage});
   }
   // chats[arg.friend].webContents.send('recoverMessages', arg)
 })
 
 ipcMain.on('accelerateGame-r', (event, arg) =>{
-  console.log("llega al client");
+  // console.log("llega al client");
   games[arg.sender].webContents.send('accelerateGame', arg)
 })
 
 ipcMain.on('gameover-r', (event, arg) =>{
-  console.log("llega al client");
+  // console.log("llega al client");
   games[arg.sender].webContents.send('gameover', arg)
 })
 
