@@ -19,7 +19,7 @@ var mysql = require('mysql');
 var dbConnection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : 'homecoming96',
+  password : 'diaz.1913',
   database : 'senses'
 });
 
@@ -35,7 +35,7 @@ var transporter = nodemailer.createTransport({
 var mailOptions = {
   from: ' "Senses Chat" <supportsenses@mail.com>',
   subject: 'Welcome to Senses ',
-  text: "Thanks for joining to senseswe hope you have a good time with us",
+  text: "Thanks for joining to senses we hope you have a good time with us",
   to: ''
 };
 

@@ -54,7 +54,7 @@ var JsonFormatter = { stringify: function (cipherParams) {
 function createWindow() {
   console.log(__dirname + '/resources/img/graph-icon.png');
   var imageN = nativeImage.createFromPath(__dirname + '/resources/img/Accept-icon.png');
-  win = new BrowserWindow({width: 800, height: 600, icon: imageN});
+  win = new BrowserWindow({width: 400, height: 300, icon: imageN});
 
   win.loadURL('file://' + __dirname + '/views/login.html');
   win.webContents.openDevTools();
@@ -83,7 +83,7 @@ ipcMain.on('succeedLogin', (event, arg) =>{
   chatUser = arg.name
   token = arg.token
   secret = arg.secret
-  watchWindow = new BrowserWindow({parent: win,width: 300, height: 200, show: false, transparent: true});
+  watchWindow = new BrowserWindow({parent: win,width: 200, height: 100, show: false, transparent: true});
   watchWindow.loadURL('file://' + __dirname + '/views/watch.html');
   watchWindow.webContents.openDevTools();
 })
@@ -106,7 +106,7 @@ ipcMain.on('new-chat', (event, arg) => {
   }
   if(friends.indexOf(arg.friend) == -1){
     friends.push(arg.friend)
-    var newChat = new BrowserWindow({width: 800, height: 600});
+    var newChat = new BrowserWindow({width: 400, height: 300});
     newChat.loadURL('file://'+__dirname+'/views/index.html');
     newChat.webContents.openDevTools();
     // newChat.on('close', () => {
