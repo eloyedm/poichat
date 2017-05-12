@@ -54,7 +54,7 @@ var JsonFormatter = { stringify: function (cipherParams) {
 function createWindow() {
   console.log(__dirname + '/resources/img/graph-icon.png');
   var imageN = nativeImage.createFromPath(__dirname + '/resources/img/Accept-icon.png');
-  win = new BrowserWindow({width: 400, height: 300, icon: imageN});
+  win = new BrowserWindow({width: 400, height: 300, icon: imageN, title: 'Senses'});
 
   win.loadURL('file://' + __dirname + '/views/login.html');
   win.webContents.openDevTools();
@@ -106,7 +106,7 @@ ipcMain.on('new-chat', (event, arg) => {
   }
   if(friends.indexOf(arg.friend) == -1){
     friends.push(arg.friend)
-    var newChat = new BrowserWindow({width: 400, height: 300});
+    var newChat = new BrowserWindow({width: 400, height: 300, title: arg.friend});
     newChat.loadURL('file://'+__dirname+'/views/index.html');
     newChat.webContents.openDevTools();
     // newChat.on('close', () => {
@@ -142,7 +142,10 @@ ipcMain.on('opened-game', (event, arg) => {
 
 ipcMain.on('chat message', (event, arg) => {
   // socket.emit('chat message', arg
+
   var tempArg = JSON.parse(arg);
+
+
   if(chats[tempArg.name]['started'] != true){
     tempArg.token = token;
     tempArg.crypting = crypting;
@@ -181,6 +184,7 @@ ipcMain.on('leave', (event, arg) => {
 
 ipcMain.on('buzz', (event, arg) => {
   // socket.emit("buzz", arg);
+
   watchWindow.webContents.send('buzz', arg);
 })
 
@@ -248,7 +252,7 @@ ipcMain.on('chat message-r', (event, arg) => {
     console.log(arg)
     if(friends.indexOf(arg.sender) == -1){
       friends.push(arg.sender)
-      var newChat = new BrowserWindow({width: 800, height: 600});
+      var newChat = new BrowserWindow({width: 800, height: 600, title: arg.sender});
       newChat.loadURL('file://'+__dirname+'/views/index.html');
       newChat.webContents.openDevTools();
       // newChat.on('close', () => {
@@ -301,6 +305,11 @@ ipcMain.on('leave-r', (event, arg) => {
 
 ipcMain.on('buzz-r', (event, arg) => {
   // socket.emit("buzz", arg);
+  var animation = [2, -4, 4, -4, 4, -4, 4, -2];
+  var positionStart = chats[arg.sender].getPosition();
+  for (var i = 0; i < animation.length; i++) {
+    chats[arg.sender].setPosition(positionStart[0]+animation[i], positionStart[1]+animation[i]*-1, true);
+  }
   chats[arg.sender].webContents.send('buzz', arg);
   chats[arg.sender].flashFrame(true);
 
@@ -344,7 +353,7 @@ ipcMain.on('startGame-r', (event, arg) => {
 ipcMain.on('acceptGame-r', (event, arg) => {
   if(friends.indexOf(arg.sender) != -1){
     if(arg.answer == true){
-      var newGame = new BrowserWindow({width: 800, height: 600});
+      var newGame = new BrowserWindow({width: 800, height: 600, title: 'Invaderz'});
       newGame.loadURL('file://'+__dirname+'/views/game.html');
       newGame.webContents.openDevTools();
       newGame.friend = arg.sender
