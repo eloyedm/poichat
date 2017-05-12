@@ -47,7 +47,7 @@
           <button type="button" name="button" id="callBtn"><i class="fa fa-phone" aria-hidden="true"></i></button>
           <button type="button" name="hang" id="hangUp"><i class="fa fa-times-rectangle" aria-hidden="true"></i></button>
           <button type="button" name="buzz" id="buzz"><i class="fa fa-bullhorn" aria-hidden="true"></i></button>
-          <button type="button" name="button" id="startCamera"><i class="fa fa-video-camera" aria-hidden="true"></i></button>
+          <!-- <button type="button" name="button" id="startCamera"><i class="fa fa-video-camera" aria-hidden="true"></i></button> -->
         </div>
         <!--<input type="text" name="name" id="callUser" value="">-->
         <form  action="" >
@@ -345,7 +345,10 @@
       })
 
       $("#hangUp").click(function(){
-        if(this.src != null){
+        console.log("si le picas");
+        console.log($("#pantalla").src);
+        if($("#pantalla").attr("src") != undefined){
+          console.log("ahi nos vidrios")
           renderer.send('leave', JSON.stringify({name: friend}));
           handleLeave();
         }

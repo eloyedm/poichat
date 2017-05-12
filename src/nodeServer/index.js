@@ -19,7 +19,7 @@ var mysql = require('mysql');
 var dbConnection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : 'diaz.1913',
+  password : 'homecoming96',
   database : 'senses'
 });
 
@@ -38,11 +38,6 @@ var mailOptions = {
   text: "Thanks for joining to senseswe hope you have a good time with us",
   to: ''
 };
-
-getBadges('eloy.edm', function(results){
-  console.log(results);
-});
-console.log('depues esto');
 
 //dbConnection.connect("");
 
@@ -231,6 +226,7 @@ io.on('connection', function(socket){
 
   socket.on('leave', function(msg){
     var data = validateMessage(msg)
+    console.log("este wey se fue");
     if(data){
       var conn = users[data.name]
       socket.broadcast.to(users[data.name]).emit('leave', {
@@ -359,7 +355,6 @@ io.on('connection', function(socket){
   })
 
   socket.on('startGame', function(msg){
-    console.log(msg)
     if(msg.friend != ""){
       if(users[msg.friend]){
             console.log(users[msg.friend])
@@ -404,6 +399,22 @@ io.on('connection', function(socket){
         })
 
         addPoint(socket.name);
+      }
+    }
+  })
+
+  socket.on('gameover', function(msg){
+    console.log("ya perdiste"+ socket.name);
+    if(msg.friend != ""){
+      console.log("llego al server el gameover");
+      console.log(msg);
+      if(users[msg.friend]){
+        console.log(users[msg.friend])
+        socket.broadcast.to(users[msg.friend]).emit('gameover', {
+          sender: socket.name
+        })
+
+        saveWin(msg.friend);
       }
     }
   })
@@ -524,13 +535,13 @@ function recoverMessages(receiver, sender, callback){
 
 function addPoint(player){
   dbConnection.query('UPDATE user SET points = points+1 WHERE username = ?', [player], function(error, results, fields){
-    console.log(results);
+    // console.log(results);
   })
 }
 
-function saveWin(plauyer){
+function saveWin(player){
   dbConnection.query('UPDATE user SET record = record+1 WHERE username = ?', [player], function(error, results, fields){
-    console.log(results);
+    // console.log(results);
   })
 }
 

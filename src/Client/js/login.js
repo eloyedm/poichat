@@ -69,6 +69,15 @@ function chatWindow(){
         friend += "<li class='selectable' data="+person.username+">"+person.username+"<span>"+person.status+"  </span></li>";
       }
       multipleFriends.html(friend);
+
+      var contenedorTrofeos = $(".thropyContainer");
+      contenedorTrofeos.empty();
+
+      var trofeos = '';
+      for (badge of data.badges) {
+        trofeos += '<div class="thropy"><label>'+badge.name+'</label><div class="image"><img src="../resources/img/Accept-icon.png" alt=""/></div><details open><summary>Detalles del trofeo</summary><p>'+badge.description+'</p></details></div>';
+      }
+      contenedorTrofeos.html(trofeos);
     contacts.html('<span>Contactos</span>');
     contacts.append(friends);
     contacts.append(multipleFriends);

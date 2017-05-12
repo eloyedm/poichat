@@ -83,6 +83,10 @@
       socket.emit('accelerateGame', arg)
     })
 
+    renderer.on('gameover', (event, arg) =>{
+      socket.emit('gameover', arg)
+    })
+
     socket.on('chat message', function(msg){
       console.log("si llega al watch")
       renderer.send('chat message-r', msg)
@@ -133,6 +137,10 @@
 
     socket.on('accelerateGame', function(data){
       renderer.send('accelerateGame-r', data)
+    })
+
+    socket.on('gameover', function(data){
+      renderer.send('gameover-r', data)
     })
 
     </script>

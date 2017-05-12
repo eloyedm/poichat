@@ -221,7 +221,7 @@ Game.prototype.keyup = function(keyCode) {
 };
 Game.prototype.addVel = function () {
   if (this.stateStack[0].constructor == PlayState) {
-    this.stateStack[0].config.addVel += 0.005;
+    this.stateStack[0].config.addVel += 0.002;
   }
 };
 Game.prototype.getVel = function () {
@@ -507,6 +507,9 @@ PlayState.prototype.update = function(game, dt) {
 
   if(game.lives <= 0) {
     game.moveToState(new GameOverState());
+    var event = new Event('gameover');
+    // window.dispatchEvent(event);
+    document.dispatchEvent(event);
   }
 
   if(this.invaders.length === 0) {
